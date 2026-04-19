@@ -500,15 +500,33 @@
           <div class="page d-none" id="page-materials">
             <div class="page-header">
               <h5 class="mb-0"><i class="bi bi-boxes me-2"></i>วัตถุดิบ</h5>
-              <div class="d-flex gap-2">
-                <input
-                  type="text"
-                  class="form-control form-control-sm"
-                  id="material-search"
-                  placeholder="ค้นหา..."
-                  style="width: 200px"
-                  oninput="filterMaterials()"
-                />
+              <div class="d-flex gap-2 align-items-center">
+                <div class="mat-view-toggle">
+                  <button
+                    class="mat-view-btn active"
+                    data-view="grid"
+                    title="แบบการ์ด"
+                  >
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                  </button>
+                  <button
+                    class="mat-view-btn"
+                    data-view="list"
+                    title="แบบรายการ"
+                  >
+                    <i class="bi bi-list-ul"></i>
+                  </button>
+                </div>
+                <div class="mat-search-box">
+                  <i class="bi bi-search"></i>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="material-search"
+                    placeholder="ค้นหาวัตถุดิบ..."
+                    oninput="filterMaterials()"
+                  />
+                </div>
                 <button
                   class="btn btn-primary btn-sm manager-only"
                   onclick="showMaterialModal()"
@@ -517,30 +535,49 @@
                 </button>
               </div>
             </div>
-            <div class="card">
-              <div class="card-body p-0">
-                <div class="table-responsive">
-                  <table
-                    class="table table-hover align-middle mb-0"
-                    id="materials-table"
-                  >
-                    <thead class="table-dark">
-                      <tr>
-                        <th>รหัส</th>
-                        <th>ชื่อวัตถุดิบ</th>
-                        <th>หน่วย</th>
-                        <th class="text-end">คงเหลือ</th>
-                        <th class="text-end">ขั้นต่ำ</th>
-                        <th class="text-end">ราคา/หน่วย</th>
-                        <th>สถานะ</th>
-                        <th>จัดการ</th>
-                      </tr>
-                    </thead>
-                    <tbody id="materials-tbody"></tbody>
-                  </table>
+
+            <!-- Summary Stats -->
+            <div class="mat-summary">
+              <div class="mat-summary-item">
+                <div class="mat-summary-icon blue">
+                  <i class="bi bi-boxes"></i>
+                </div>
+                <div class="mat-summary-info">
+                  <span class="mat-summary-value" id="mat-total-count">0</span>
+                  <span class="mat-summary-label">รายการทั้งหมด</span>
+                </div>
+              </div>
+              <div class="mat-summary-item">
+                <div class="mat-summary-icon green">
+                  <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div class="mat-summary-info">
+                  <span class="mat-summary-value" id="mat-ok-count">0</span>
+                  <span class="mat-summary-label">สต็อกปกติ</span>
+                </div>
+              </div>
+              <div class="mat-summary-item">
+                <div class="mat-summary-icon amber">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="mat-summary-info">
+                  <span class="mat-summary-value" id="mat-low-count">0</span>
+                  <span class="mat-summary-label">สต็อกต่ำ</span>
+                </div>
+              </div>
+              <div class="mat-summary-item">
+                <div class="mat-summary-icon red">
+                  <i class="bi bi-x-circle-fill"></i>
+                </div>
+                <div class="mat-summary-info">
+                  <span class="mat-summary-value" id="mat-out-count">0</span>
+                  <span class="mat-summary-label">สต็อกหมด</span>
                 </div>
               </div>
             </div>
+
+            <!-- Card Grid -->
+            <div class="mat-grid" id="materials-grid"></div>
           </div>
 
           <!-- ─── PRODUCTS ─── -->

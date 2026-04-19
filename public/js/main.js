@@ -267,7 +267,9 @@ function navigate(page) {
   requestAnimationFrame(() => {
     if (target) {
       const animItems = [
-        ...target.querySelectorAll(".stat-card, .quick-action, .card, .kanban-col, .page-header"),
+        ...target.querySelectorAll(
+          ".stat-card, .quick-action, .card, .kanban-col, .page-header",
+        ),
       ];
       animItems.forEach((el) => el.classList.remove("animate"));
       animItems.forEach((el, i) => {
@@ -465,45 +467,84 @@ const materials = {
   },
 
   render(data) {
-    const tbody = document.getElementById("materials-tbody");
+    const grid = document.getElementById("materials-grid");
+
+    // Update summary counts
+    const total = data.length;
+    const okCount = data.filter(m => m.quantity > m.min_quantity).length;
+    const lowCount = data.filter(m => m.quantity <= m.min_quantity && m.quantity > 0).length;
+    const outCount = data.filter(m => m.quantity === 0).length;
+    document.getElementById("mat-total-count").textContent = total;
+    document.getElementById("mat-ok-count").textContent = okCount;
+    document.getElementById("mat-low-count").textContent = lowCount;
+    document.getElementById("mat-out-count").textContent = outCount;
+
     if (!data.length) {
-      tbody.innerHTML =
-        '<tr><td colspan="8" class="text-center text-muted py-4">ไม่มีข้อมูลวัตถุดิบ</td></tr>';
+      grid.innerHTML = '<div class="mat-empty"><i class="bi bi-inbox"></i><span>ไม่มีข้อมูลวัตถุดิบ</span></div>';
       return;
     }
+
     const canEdit = ["admin", "manager"].includes(currentUser?.role);
-    tbody.innerHTML = data
-      .map((m) => {
-        const isLow = m.quantity <= m.min_quantity && m.quantity > 0;
-        const isEmpty = m.quantity === 0;
-        const stockCls = isEmpty
-          ? "stock-out"
-          : isLow
-            ? "stock-low"
-            : "stock-ok";
-        const stockBadge = isEmpty
-          ? '<span class="badge-status status-cancelled">หมด</span>'
-          : isLow
-            ? '<span class="badge-status status-pending">ต่ำ</span>'
-            : '<span class="badge-status status-paid">ปกติ</span>';
-        return `<tr>
-        <td><code>${m.code}</code></td>
-        <td class="fw-semibold">${m.name}</td>
-        <td>${m.unit}</td>
-        <td class="text-end ${stockCls}">${fmt.number(m.quantity)}</td>
-        <td class="text-end text-muted">${fmt.number(m.min_quantity)}</td>
-        <td class="text-end">${fmt.currency(m.cost_per_unit)}</td>
-        <td>${stockBadge}</td>
-        <td>
-          <div class="d-flex gap-1">
-            <button class="btn btn-outline-success btn-sm" title="รับเข้า/เบิกออก" onclick="showAdjustModal(${m.id})"><i class="bi bi-arrow-down-up"></i></button>
-            <button class="btn btn-outline-secondary btn-sm" title="ประวัติ" onclick="showLogsModal(${m.id},'${m.name}')"><i class="bi bi-clock-history"></i></button>
-            ${canEdit ? `<button class="btn btn-outline-primary btn-sm" onclick="showMaterialModal(${m.id})"><i class="bi bi-pencil"></i></button>` : ""}
+
+    // Material icon map based on keywords
+    const getIcon = (name, code) => {
+      const n = (name || "").toLowerCase();
+      if (n.includes("ขวด")) return "bi-cup-straw";
+      if (n.includes("ฝา")) return "bi-circle";
+      if (n.includes("ฉลาก")) return "bi-tag";
+      if (n.includes("ถัง")) return "bi-bucket";
+      if (n.includes("สารกรอง") || n.includes("กรอง")) return "bi-funnel";
+      if (n.includes("คาร์บอน")) return "bi-diamond-half";
+      if (n.includes("ซีล")) return "bi-shield-check";
+      return "bi-box-seam";
+    };
+
+    grid.innerHTML = data.map((m, idx) => {
+      const isLow = m.quantity <= m.min_quantity && m.quantity > 0;
+      const isEmpty = m.quantity === 0;
+      const status = isEmpty ? "empty" : isLow ? "low" : "ok";
+      const statusText = isEmpty ? "หมดสต็อก" : isLow ? "สต็อกต่ำ" : "ปกติ";
+      const icon = getIcon(m.name, m.code);
+      
+      // Stock percentage (cap at 100%, use min_quantity*2 as max reference)
+      const maxRef = Math.max(m.min_quantity * 2, 1);
+      const pct = Math.min(100, Math.round((m.quantity / maxRef) * 100));
+
+      return `<div class="mat-card status-${status}" style="animation: fadeSlideUp 400ms ${idx * 60}ms both">
+        <div class="mat-card-visual">
+          <div class="mat-card-icon"><i class="bi ${icon}"></i></div>
+          <div class="mat-card-badge">${statusText}</div>
+        </div>
+        <div class="mat-card-body">
+          <div class="mat-card-code">${m.code}</div>
+          <div class="mat-card-name" title="${m.name}">${m.name}</div>
+          <div class="mat-stock-row">
+            <span class="mat-stock-label">คงเหลือ</span>
+            <span class="mat-stock-value">${fmt.number(m.quantity)} ${m.unit}</span>
           </div>
-        </td>
-      </tr>`;
-      })
-      .join("");
+          <div class="mat-stock-bar"><div class="mat-stock-fill" style="width:${pct}%"></div></div>
+          <div class="mat-card-info">
+            <div class="mat-info-item">
+              <span class="mat-info-label">ขั้นต่ำ</span>
+              <span class="mat-info-value">${fmt.number(m.min_quantity)}</span>
+            </div>
+            <div class="mat-info-item">
+              <span class="mat-info-label">หน่วย</span>
+              <span class="mat-info-value">${m.unit}</span>
+            </div>
+            <div class="mat-info-item">
+              <span class="mat-info-label">ราคา/หน่วย</span>
+              <span class="mat-info-value">${fmt.currency(m.cost_per_unit)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="mat-card-actions">
+          <button class="btn btn-outline-success btn-sm" title="รับเข้า/เบิกออก" onclick="showAdjustModal(${m.id})"><i class="bi bi-arrow-down-up me-1"></i>ปรับสต็อก</button>
+          <button class="btn btn-outline-secondary btn-sm" title="ประวัติ" onclick="showLogsModal(${m.id},'${m.name}')"><i class="bi bi-clock-history me-1"></i>ประวัติ</button>
+          ${canEdit ? `<button class="btn btn-outline-primary btn-sm" onclick="showMaterialModal(${m.id})"><i class="bi bi-pencil me-1"></i>แก้ไข</button>` : ""}
+        </div>
+      </div>`;
+    }).join("");
   },
 };
 
@@ -516,6 +557,20 @@ window.filterMaterials = () => {
     ),
   );
 };
+
+// Material view toggle (grid/list)
+document.querySelectorAll(".mat-view-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".mat-view-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const grid = document.getElementById("materials-grid");
+    if (btn.dataset.view === "list") {
+      grid.classList.add("list-view");
+    } else {
+      grid.classList.remove("list-view");
+    }
+  });
+});
 
 window.showMaterialModal = (id) => {
   const m = id ? allMaterials.find((x) => x.id === id) : null;
