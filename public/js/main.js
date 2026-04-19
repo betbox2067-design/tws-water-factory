@@ -283,12 +283,6 @@ document.querySelectorAll(".sidebar-nav .nav-link").forEach((a) => {
   a.addEventListener("click", (e) => {
     e.preventDefault();
     navigate(a.dataset.page);
-    if (a.dataset.report) {
-      setTimeout(() => {
-        const tab = document.querySelector(`#report-tabs a[data-report="${a.dataset.report}"]`);
-        if (tab) tab.click();
-      }, 50);
-    }
     closeMobileSidebar();
   });
 });
