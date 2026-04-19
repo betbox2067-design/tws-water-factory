@@ -471,16 +471,19 @@ const materials = {
 
     // Update summary counts
     const total = data.length;
-    const okCount = data.filter(m => m.quantity > m.min_quantity).length;
-    const lowCount = data.filter(m => m.quantity <= m.min_quantity && m.quantity > 0).length;
-    const outCount = data.filter(m => m.quantity === 0).length;
+    const okCount = data.filter((m) => m.quantity > m.min_quantity).length;
+    const lowCount = data.filter(
+      (m) => m.quantity <= m.min_quantity && m.quantity > 0,
+    ).length;
+    const outCount = data.filter((m) => m.quantity === 0).length;
     document.getElementById("mat-total-count").textContent = total;
     document.getElementById("mat-ok-count").textContent = okCount;
     document.getElementById("mat-low-count").textContent = lowCount;
     document.getElementById("mat-out-count").textContent = outCount;
 
     if (!data.length) {
-      grid.innerHTML = '<div class="mat-empty"><i class="bi bi-inbox"></i><span>ไม่มีข้อมูลวัตถุดิบ</span></div>';
+      grid.innerHTML =
+        '<div class="mat-empty"><i class="bi bi-inbox"></i><span>ไม่มีข้อมูลวัตถุดิบ</span></div>';
       return;
     }
 
@@ -499,18 +502,19 @@ const materials = {
       return "bi-box-seam";
     };
 
-    grid.innerHTML = data.map((m, idx) => {
-      const isLow = m.quantity <= m.min_quantity && m.quantity > 0;
-      const isEmpty = m.quantity === 0;
-      const status = isEmpty ? "empty" : isLow ? "low" : "ok";
-      const statusText = isEmpty ? "หมดสต็อก" : isLow ? "สต็อกต่ำ" : "ปกติ";
-      const icon = getIcon(m.name, m.code);
-      
-      // Stock percentage (cap at 100%, use min_quantity*2 as max reference)
-      const maxRef = Math.max(m.min_quantity * 2, 1);
-      const pct = Math.min(100, Math.round((m.quantity / maxRef) * 100));
+    grid.innerHTML = data
+      .map((m, idx) => {
+        const isLow = m.quantity <= m.min_quantity && m.quantity > 0;
+        const isEmpty = m.quantity === 0;
+        const status = isEmpty ? "empty" : isLow ? "low" : "ok";
+        const statusText = isEmpty ? "หมดสต็อก" : isLow ? "สต็อกต่ำ" : "ปกติ";
+        const icon = getIcon(m.name, m.code);
 
-      return `<div class="mat-card status-${status}" style="animation: fadeSlideUp 400ms ${idx * 60}ms both">
+        // Stock percentage (cap at 100%, use min_quantity*2 as max reference)
+        const maxRef = Math.max(m.min_quantity * 2, 1);
+        const pct = Math.min(100, Math.round((m.quantity / maxRef) * 100));
+
+        return `<div class="mat-card status-${status}" style="animation: fadeSlideUp 400ms ${idx * 60}ms both">
         <div class="mat-card-visual">
           <div class="mat-card-icon"><i class="bi ${icon}"></i></div>
           <div class="mat-card-badge">${statusText}</div>
@@ -544,7 +548,8 @@ const materials = {
           ${canEdit ? `<button class="btn btn-outline-primary btn-sm" onclick="showMaterialModal(${m.id})"><i class="bi bi-pencil me-1"></i>แก้ไข</button>` : ""}
         </div>
       </div>`;
-    }).join("");
+      })
+      .join("");
   },
 };
 
@@ -561,7 +566,9 @@ window.filterMaterials = () => {
 // Material view toggle (grid/list)
 document.querySelectorAll(".mat-view-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".mat-view-btn").forEach((b) => b.classList.remove("active"));
+    document
+      .querySelectorAll(".mat-view-btn")
+      .forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     const grid = document.getElementById("materials-grid");
     if (btn.dataset.view === "list") {
@@ -689,43 +696,98 @@ const products = {
   },
 
   render(data) {
-    const tbody = document.getElementById("products-tbody");
+    const grid = document.getElementById("products-grid");
+
+    // Update summary counts
+    const total = data.length;
+    const okCount = data.filter((p) => p.stock > p.min_stock).length;
+    const lowCount = data.filter(
+      (p) => p.stock <= p.min_stock && p.stock > 0,
+    ).length;
+    const outCount = data.filter((p) => p.stock === 0).length;
+    document.getElementById("prod-total-count").textContent = total;
+    document.getElementById("prod-ok-count").textContent = okCount;
+    document.getElementById("prod-low-count").textContent = lowCount;
+    document.getElementById("prod-out-count").textContent = outCount;
+
     if (!data.length) {
-      tbody.innerHTML =
-        '<tr><td colspan="10" class="text-center text-muted py-4">ไม่มีสินค้า</td></tr>';
+      grid.innerHTML =
+        '<div class="prod-empty"><i class="bi bi-inbox"></i><span>ไม่มีข้อมูลสินค้า</span></div>';
       return;
     }
+
     const canEdit = ["admin", "manager"].includes(currentUser?.role);
-    tbody.innerHTML = data
-      .map((p) => {
+
+    // Product icon based on size
+    const getIcon = (size_ml) => {
+      if (size_ml >= 19000) return "bi-bucket-fill";
+      if (size_ml >= 5000) return "bi-droplet-fill";
+      if (size_ml >= 1500) return "bi-cup-hot-fill";
+      if (size_ml >= 600) return "bi-cup-straw";
+      return "bi-cup";
+    };
+
+    // Format size label
+    const sizeLabel = (ml) => {
+      if (!ml) return "-";
+      if (ml >= 1000) return (ml / 1000) + "L";
+      return ml + "ml";
+    };
+
+    grid.innerHTML = data
+      .map((p, idx) => {
         const isLow = p.stock <= p.min_stock && p.stock > 0;
         const isEmpty = p.stock === 0;
-        const badge = isEmpty
-          ? '<span class="badge-status status-cancelled">หมด</span>'
-          : isLow
-            ? '<span class="badge-status status-pending">ต่ำ</span>'
-            : '<span class="badge-status status-paid">ปกติ</span>';
-        return `<tr>
-        <td><code>${p.code}</code></td>
-        <td class="fw-semibold">${p.name}</td>
-        <td class="text-center">${p.size_ml ? p.size_ml.toLocaleString() + " ml" : "-"}</td>
-        <td class="text-center">${p.unit}</td>
-        <td class="text-end">${fmt.currency(p.price)}</td>
-        <td class="text-end">${fmt.currency(p.cost)}</td>
-        <td class="text-end ${isEmpty ? "stock-out" : isLow ? "stock-low" : "stock-ok"}">${fmt.number(p.stock)}</td>
-        <td class="text-end text-muted">${fmt.number(p.min_stock)}</td>
-        <td>${badge}</td>
-        <td>
-          ${
-            canEdit
-              ? `
-          <div class="d-flex gap-1">
-            <button class="btn btn-outline-primary btn-sm" onclick="showProductModal(${p.id})"><i class="bi bi-pencil"></i></button>
-          </div>`
-              : "-"
-          }
-        </td>
-      </tr>`;
+        const status = isEmpty ? "empty" : isLow ? "low" : "ok";
+        const statusText = isEmpty ? "หมดสต็อก" : isLow ? "สต็อกต่ำ" : "ปกติ";
+        const icon = getIcon(p.size_ml);
+        const maxRef = Math.max(p.min_stock * 2, 1);
+        const pct = Math.min(100, Math.round((p.stock / maxRef) * 100));
+        const profit = p.price - p.cost;
+
+        return `<div class="prod-card status-${status}" style="animation: fadeSlideUp 400ms ${idx * 60}ms both">
+        <div class="prod-card-visual">
+          <div class="prod-card-icon"><i class="bi ${icon}"></i></div>
+          <div class="prod-card-badge">${statusText}</div>
+          <div class="prod-card-size">${sizeLabel(p.size_ml)}</div>
+        </div>
+        <div class="prod-card-body">
+          <div class="prod-card-code">${p.code}</div>
+          <div class="prod-card-name" title="${p.name}">${p.name}</div>
+          <div class="prod-price-row">
+            <div class="prod-price-item">
+              <span class="prod-price-label">ราคาขาย</span>
+              <span class="prod-price-value sale">${fmt.currency(p.price)}</span>
+            </div>
+            <div class="prod-price-item">
+              <span class="prod-price-label">ต้นทุน</span>
+              <span class="prod-price-value cost">${fmt.currency(p.cost)}</span>
+            </div>
+            <div class="prod-price-item">
+              <span class="prod-price-label">กำไร</span>
+              <span class="prod-price-value profit">${fmt.currency(profit)}</span>
+            </div>
+          </div>
+          <div class="prod-stock-row">
+            <span class="prod-stock-label">คงเหลือ</span>
+            <span class="prod-stock-value">${fmt.number(p.stock)} ${p.unit}</span>
+          </div>
+          <div class="prod-stock-bar"><div class="prod-stock-fill" style="width:${pct}%"></div></div>
+          <div class="prod-card-info">
+            <div class="prod-info-item">
+              <span class="prod-info-label">ขั้นต่ำ</span>
+              <span class="prod-info-value">${fmt.number(p.min_stock)}</span>
+            </div>
+            <div class="prod-info-item">
+              <span class="prod-info-label">หน่วย</span>
+              <span class="prod-info-value">${p.unit}</span>
+            </div>
+          </div>
+        </div>
+        <div class="prod-card-actions">
+          ${canEdit ? `<button class="btn btn-outline-primary btn-sm" onclick="showProductModal(${p.id})"><i class="bi bi-pencil me-1"></i>แก้ไข</button>` : ""}
+        </div>
+      </div>`;
       })
       .join("");
   },
@@ -740,6 +802,22 @@ window.filterProducts = () => {
     ),
   );
 };
+
+// Product view toggle (grid/list)
+document.querySelectorAll(".prod-view-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document
+      .querySelectorAll(".prod-view-btn")
+      .forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const grid = document.getElementById("products-grid");
+    if (btn.dataset.view === "list") {
+      grid.classList.add("list-view");
+    } else {
+      grid.classList.remove("list-view");
+    }
+  });
+});
 
 window.showProductModal = (id) => {
   const p = id ? allProducts.find((x) => x.id === id) : null;

@@ -586,15 +586,33 @@
               <h5 class="mb-0">
                 <i class="bi bi-droplet-half me-2"></i>สินค้า
               </h5>
-              <div class="d-flex gap-2">
-                <input
-                  type="text"
-                  class="form-control form-control-sm"
-                  id="product-search"
-                  placeholder="ค้นหา..."
-                  style="width: 200px"
-                  oninput="filterProducts()"
-                />
+              <div class="d-flex gap-2 align-items-center">
+                <div class="prod-view-toggle">
+                  <button
+                    class="prod-view-btn active"
+                    data-view="grid"
+                    title="แบบการ์ด"
+                  >
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                  </button>
+                  <button
+                    class="prod-view-btn"
+                    data-view="list"
+                    title="แบบรายการ"
+                  >
+                    <i class="bi bi-list-ul"></i>
+                  </button>
+                </div>
+                <div class="prod-search-box">
+                  <i class="bi bi-search"></i>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="product-search"
+                    placeholder="ค้นหาสินค้า..."
+                    oninput="filterProducts()"
+                  />
+                </div>
                 <button
                   class="btn btn-primary btn-sm manager-only"
                   onclick="showProductModal()"
@@ -603,29 +621,49 @@
                 </button>
               </div>
             </div>
-            <div class="card">
-              <div class="card-body p-0">
-                <div class="table-responsive">
-                  <table class="table table-hover align-middle mb-0">
-                    <thead class="table-dark">
-                      <tr>
-                        <th>รหัส</th>
-                        <th>ชื่อสินค้า</th>
-                        <th>ขนาด</th>
-                        <th>หน่วย</th>
-                        <th class="text-end">ราคาขาย</th>
-                        <th class="text-end">ต้นทุน</th>
-                        <th class="text-end">สต็อก</th>
-                        <th class="text-end">ขั้นต่ำ</th>
-                        <th>สถานะ</th>
-                        <th>จัดการ</th>
-                      </tr>
-                    </thead>
-                    <tbody id="products-tbody"></tbody>
-                  </table>
+
+            <!-- Summary Stats -->
+            <div class="prod-summary">
+              <div class="prod-summary-item">
+                <div class="prod-summary-icon blue">
+                  <i class="bi bi-droplet-half"></i>
+                </div>
+                <div class="prod-summary-info">
+                  <span class="prod-summary-value" id="prod-total-count">0</span>
+                  <span class="prod-summary-label">สินค้าทั้งหมด</span>
+                </div>
+              </div>
+              <div class="prod-summary-item">
+                <div class="prod-summary-icon green">
+                  <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div class="prod-summary-info">
+                  <span class="prod-summary-value" id="prod-ok-count">0</span>
+                  <span class="prod-summary-label">สต็อกปกติ</span>
+                </div>
+              </div>
+              <div class="prod-summary-item">
+                <div class="prod-summary-icon amber">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="prod-summary-info">
+                  <span class="prod-summary-value" id="prod-low-count">0</span>
+                  <span class="prod-summary-label">สต็อกต่ำ</span>
+                </div>
+              </div>
+              <div class="prod-summary-item">
+                <div class="prod-summary-icon red">
+                  <i class="bi bi-x-circle-fill"></i>
+                </div>
+                <div class="prod-summary-info">
+                  <span class="prod-summary-value" id="prod-out-count">0</span>
+                  <span class="prod-summary-label">สต็อกหมด</span>
                 </div>
               </div>
             </div>
+
+            <!-- Card Grid -->
+            <div class="prod-grid" id="products-grid"></div>
           </div>
 
           <!-- ─── PRODUCTION ─── -->
