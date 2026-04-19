@@ -241,6 +241,11 @@ function navigate(page) {
     a.classList.toggle("active", a.dataset.page === page);
   });
 
+  // Sync bottom nav
+  document.querySelectorAll(".bottom-nav-item").forEach((a) => {
+    a.classList.toggle("active", a.dataset.page === page);
+  });
+
   document.getElementById("page-title").textContent = pageTitles[page] || page;
 
   // Load data
@@ -257,6 +262,19 @@ function navigate(page) {
     settings: { load: loadSettingsPage },
   };
   if (loaders[page]) loaders[page].load?.();
+
+  // Staggered entrance animations
+  requestAnimationFrame(() => {
+    if (target) {
+      const animItems = [
+        ...target.querySelectorAll(".stat-card, .quick-action, .card, .kanban-col, .page-header"),
+      ];
+      animItems.forEach((el) => el.classList.remove("animate"));
+      animItems.forEach((el, i) => {
+        setTimeout(() => el.classList.add("animate"), i * 60);
+      });
+    }
+  });
 }
 
 document.querySelectorAll(".sidebar-nav .nav-link").forEach((a) => {
@@ -289,7 +307,17 @@ document.getElementById("sidebar-toggle").addEventListener("click", () => {
   }
 });
 
-document.getElementById("sidebar-backdrop").addEventListener("click", closeMobileSidebar);
+document
+  .getElementById("sidebar-backdrop")
+  .addEventListener("click", closeMobileSidebar);
+
+// ─── Bottom Nav ──────────────────────────────────────────
+document.querySelectorAll(".bottom-nav-item").forEach((a) => {
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigate(a.dataset.page);
+  });
+});
 
 // ─── DASHBOARD ───────────────────────────────────────────
 const dashboard = {

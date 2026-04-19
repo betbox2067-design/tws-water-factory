@@ -749,18 +749,156 @@ body {
 }
 
 .page {
-  animation: pagein 180ms ease both;
+  animation: pagein 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes pagein {
   from {
     opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(18px) scale(0.98);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* ── Stagger animations ── */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  70% {
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rowFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Animate stat cards ── */
+.stat-card.animate {
+  animation: fadeSlideUp 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Animate quick actions ── */
+.quick-action.animate {
+  animation: scaleIn 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Animate cards ── */
+.card.animate {
+  animation: fadeSlideUp 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Animate table rows ── */
+.table tbody tr.animate {
+  animation: rowFadeIn 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Animate kanban cards ── */
+.kanban-card.animate {
+  animation: fadeSlideUp 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Animate kanban columns ── */
+.kanban-col.animate {
+  animation: scaleIn 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Animate page header ── */
+.page-header.animate {
+  animation: fadeSlideIn 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Badge pop ── */
+.badge-status.animate {
+  animation: popIn 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Stat value count-up feel ── */
+.stat-card .stat-value.animate {
+  animation: countUp 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Notification items ── */
+.notif-item.animate {
+  animation: slideDown 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Page header */
@@ -802,7 +940,8 @@ body {
 }
 
 .stat-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .stat-card .stat-icon {
@@ -1061,12 +1200,18 @@ body {
   font-size: 13px;
   border-radius: var(--r);
   transition:
-    background var(--t),
-    box-shadow var(--t);
+    background 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
   display: inline-flex;
   align-items: center;
   gap: 6px;
   line-height: 1;
+}
+
+.btn:active {
+  transform: scale(0.95);
+  transition-duration: 80ms;
 }
 
 .btn-primary {
@@ -1156,6 +1301,18 @@ body {
   border-radius: var(--r-xl);
   box-shadow: var(--sh-xl);
   overflow: hidden;
+  animation: modalIn 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .modal-header {
@@ -1219,6 +1376,18 @@ body {
   border: 1px solid var(--border);
   font-size: 13.5px;
   font-weight: 500;
+  animation: toastSlide 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes toastSlide {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 /* ==============================================================
@@ -1793,6 +1962,87 @@ code {
 }
 
 /* ==============================================================
+   BOTTOM NAVIGATION BAR (MOBILE)
+============================================================== */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+  z-index: 900;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 8px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex;
+  }
+  #content-area {
+    padding-bottom: 76px;
+  }
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1;
+  padding: 6px 4px;
+  text-decoration: none;
+  color: var(--t4);
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: var(--r-lg);
+  transition: all 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.bottom-nav-item i {
+  font-size: 20px;
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bottom-nav-item span {
+  letter-spacing: 0.2px;
+  line-height: 1;
+}
+
+.bottom-nav-item.active {
+  color: var(--blue-600);
+}
+
+.bottom-nav-item.active i {
+  transform: scale(1.15);
+}
+
+.bottom-nav-item.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 3px;
+  background: var(--blue-600);
+  border-radius: 0 0 4px 4px;
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.9);
+  transition-duration: 80ms;
+}
+
+/* ==============================================================
    QUICK ACTIONS (DASHBOARD)
 ============================================================== */
 .quick-actions {
@@ -1808,7 +2058,7 @@ code {
   border-radius: var(--r-lg);
   padding: 14px 16px;
   cursor: pointer;
-  transition: all var(--t);
+  transition: all 250ms cubic-bezier(0.22, 1, 0.36, 1);
   text-align: center;
   box-shadow: var(--sh-xs);
 }
@@ -1817,8 +2067,13 @@ code {
   border-color: var(--blue-500);
   box-shadow:
     0 0 0 3px rgba(59, 130, 246, 0.08),
-    var(--sh-sm);
-  transform: translateY(-2px);
+    var(--sh-md);
+  transform: translateY(-4px) scale(1.03);
+}
+
+.quick-action:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 100ms;
 }
 
 .qa-icon {
