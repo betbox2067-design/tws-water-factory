@@ -169,13 +169,13 @@ if (!adminExists) {
   const insertProduct = db.prepare(
     "INSERT INTO products (code,name,size_ml,unit,price,cost,stock,min_stock) VALUES (?,?,?,?,?,?,?,?)",
   );
-  insertProduct.run("P001", "น้ำดื่ม TWS 350ml", 350, "ขวด", 6, 3, 200, 50);
-  insertProduct.run("P002", "น้ำดื่ม TWS 600ml", 600, "ขวด", 8, 4, 150, 50);
-  insertProduct.run("P003", "น้ำดื่ม TWS 1.5L", 1500, "ขวด", 12, 6, 100, 30);
-  insertProduct.run("P004", "น้ำดื่ม TWS 5L", 5000, "ขวด", 25, 15, 50, 20);
+  insertProduct.run("P001", "น้ำดื่มตะวันแดง 350ml", 350, "ขวด", 6, 3, 200, 50);
+  insertProduct.run("P002", "น้ำดื่มตะวันแดง 600ml", 600, "ขวด", 8, 4, 150, 50);
+  insertProduct.run("P003", "น้ำดื่มตะวันแดง 1.5L", 1500, "ขวด", 12, 6, 100, 30);
+  insertProduct.run("P004", "น้ำดื่มตะวันแดง 5L", 5000, "ขวด", 25, 15, 50, 20);
   insertProduct.run(
     "P005",
-    "น้ำดื่ม TWS ถัง 19L",
+    "น้ำดื่มตะวันแดง ถัง 19L",
     19000,
     "ถัง",
     40,
@@ -1175,7 +1175,7 @@ app.get("*", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\n🚰 TWS Water Factory System`);
+  console.log(`\n� น้ำดื่ม ตะวันแดง TWS`);
   console.log(`📡 URL: http://localhost:${PORT}`);
   console.log(`👤 admin/admin123 | manager/manager123 | staff/staff123\n`);
 });

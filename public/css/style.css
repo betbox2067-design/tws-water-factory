@@ -9,12 +9,12 @@
   --sidebar-w: 252px;
   --topbar-h: 60px;
 
-  /* Blue scale */
-  --blue-50: #eff6ff;
-  --blue-100: #dbeafe;
-  --blue-500: #3b82f6;
-  --blue-600: #2563eb;
-  --blue-700: #1d4ed8;
+  /* Red scale */
+  --blue-50: #fef2f2;
+  --blue-100: #fee2e2;
+  --blue-500: #ef4444;
+  --blue-600: #dc2626;
+  --blue-700: #b91c1c;
 
   /* Surfaces */
   --bg: #f1f5f9;
@@ -33,9 +33,9 @@
   --sb: #0f172a;
   --sb-border: rgba(255, 255, 255, 0.07);
   --sb-hover: rgba(255, 255, 255, 0.05);
-  --sb-active: rgba(59, 130, 246, 0.13);
+  --sb-active: rgba(239, 68, 68, 0.13);
   --sb-txt: #94a3b8;
-  --sb-txt-on: #93c5fd;
+  --sb-txt-on: #fca5a5;
   --sb-txt-hi: #e2e8f0;
 
   /* Semantic colors */
@@ -116,12 +116,12 @@ body {
   background:
     radial-gradient(
       ellipse 60% 50% at 15% 85%,
-      rgba(37, 99, 235, 0.28) 0%,
+      rgba(220, 38, 38, 0.28) 0%,
       transparent 55%
     ),
     radial-gradient(
       ellipse 45% 40% at 85% 15%,
-      rgba(14, 165, 233, 0.18) 0%,
+      rgba(239, 68, 68, 0.18) 0%,
       transparent 55%
     );
   pointer-events: none;
@@ -192,7 +192,7 @@ body {
 
 .login-left-heading em {
   font-style: normal;
-  color: #93c5fd;
+  color: #fca5a5;
 }
 
 .login-left-sub {
@@ -1001,9 +1001,9 @@ body {
 }
 
 .stat-primary {
-  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  background: linear-gradient(135deg, #991b1b, #dc2626);
   color: #fff;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.35);
 }
 .stat-success {
   background: linear-gradient(135deg, #064e3b, #059669);
@@ -1021,9 +1021,9 @@ body {
   box-shadow: 0 4px 16px rgba(220, 38, 38, 0.32);
 }
 .stat-info {
-  background: linear-gradient(135deg, #0c4a6e, #0284c7);
+  background: linear-gradient(135deg, #7f1d1d, #b91c1c);
   color: #fff;
-  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.32);
+  box-shadow: 0 4px 16px rgba(185, 28, 28, 0.32);
 }
 .stat-secondary {
   background: linear-gradient(135deg, #1e293b, #475569);
@@ -1151,8 +1151,8 @@ body {
   color: #92400e;
 }
 .status-confirmed {
-  background: #dbeafe;
-  color: #1e40af;
+  background: #fee2e2;
+  color: #991b1b;
 }
 .status-in_progress {
   background: #ede9fe;
@@ -1940,8 +1940,8 @@ code {
   color: var(--amber);
 }
 .notif-icon.info {
-  background: #dbeafe;
-  color: var(--sky);
+  background: #fee2e2;
+  color: var(--red);
 }
 
 .notif-empty {
@@ -2864,7 +2864,7 @@ code {
   overflow: hidden;
 }
 .prod-card.status-ok .prod-card-visual {
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
 }
 .prod-card.status-low .prod-card-visual {
   background: linear-gradient(135deg, #fffbeb, #fef3c7);
@@ -3494,8 +3494,8 @@ code {
   color: #92400e;
 }
 .alert-item.info {
-  background: #dbeafe;
-  color: #1e40af;
+  background: #fee2e2;
+  color: #991b1b;
 }
 .alert-item i {
   font-size: 14px;

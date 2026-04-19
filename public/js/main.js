@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   TWS Water Factory Management System - Frontend JavaScript
+   น้ำดื่ม ตะวันแดง TWS Management System - Frontend JavaScript
 ═══════════════════════════════════════════════════════════ */
 
 "use strict";
@@ -408,7 +408,7 @@ const dashboard = {
       type: "doughnut",
       data: {
         labels: data.map((d) =>
-          d.name.replace("น้ำดื่ม TWS ", "").replace("น้ำดื่ม ", ""),
+          d.name.replace("น้ำดื่มตะวันแดง ", "").replace("น้ำดื่ม ", ""),
         ),
         datasets: [
           {
@@ -1633,7 +1633,7 @@ const reports = {
         data: {
           labels: d.byProduct
             .slice(0, 5)
-            .map((r) => r.name.replace("น้ำดื่ม TWS ", "")),
+            .map((r) => r.name.replace("น้ำดื่มตะวันแดง ", "")),
           datasets: [
             {
               label: "ยอดขาย",
@@ -1998,7 +1998,7 @@ window.printInvoice = () => {
   const bodyEl = document.getElementById("sale-detail-body");
   const orderNum = document.getElementById("detail-order-num").textContent;
   const co = JSON.parse(localStorage.getItem("tws_company") || "{}");
-  const companyName = co.name || "TWS Water Factory";
+  const companyName = co.name || "น้ำดื่ม ตะวันแดง TWS";
   const companyAddr = co.address || "";
   const companyPhone = co.phone || "";
 
