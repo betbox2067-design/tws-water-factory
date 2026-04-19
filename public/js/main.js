@@ -140,6 +140,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
       password: document.getElementById("login-password").value,
     });
     localStorage.setItem("tws_token", token);
+    localStorage.setItem("tws_login_time", new Date().toISOString());
     currentUser = user;
     showApp();
   } catch (err) {
@@ -155,6 +156,7 @@ document.getElementById("logout-btn").addEventListener("click", doLogout);
 
 function doLogout() {
   localStorage.removeItem("tws_token");
+  localStorage.removeItem("tws_login_time");
   currentUser = null;
   document.getElementById("app-screen").style.display = "none";
   document.getElementById("login-screen").style.display = "flex";
@@ -546,6 +548,7 @@ const materials = {
           <button class="btn btn-outline-success btn-sm" title="รับเข้า/เบิกออก" onclick="showAdjustModal(${m.id})"><i class="bi bi-arrow-down-up me-1"></i>ปรับสต็อก</button>
           <button class="btn btn-outline-secondary btn-sm" title="ประวัติ" onclick="showLogsModal(${m.id},'${m.name}')"><i class="bi bi-clock-history me-1"></i>ประวัติ</button>
           ${canEdit ? `<button class="btn btn-outline-primary btn-sm" onclick="showMaterialModal(${m.id})"><i class="bi bi-pencil me-1"></i>แก้ไข</button>` : ""}
+          ${canEdit ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteMaterial(${m.id})"><i class="bi bi-trash me-1"></i>ลบ</button>` : ""}
         </div>
       </div>`;
       })
@@ -618,6 +621,17 @@ window.saveMaterial = async () => {
     bootstrap.Modal.getInstance(
       document.getElementById("materialModal"),
     )?.hide();
+    materials.load();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
+};
+
+window.deleteMaterial = async (id) => {
+  if (!confirm("ต้องการลบวัตถุดิบนี้?")) return;
+  try {
+    await api.delete("/api/materials/" + id);
+    toast("ลบวัตถุดิบสำเร็จ", "warning");
     materials.load();
   } catch (err) {
     toast(err.message, "danger");
@@ -786,6 +800,7 @@ const products = {
         </div>
         <div class="prod-card-actions">
           ${canEdit ? `<button class="btn btn-outline-primary btn-sm" onclick="showProductModal(${p.id})"><i class="bi bi-pencil me-1"></i>แก้ไข</button>` : ""}
+          ${canEdit ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteProduct(${p.id})"><i class="bi bi-trash me-1"></i>ลบ</button>` : ""}
         </div>
       </div>`;
       })
@@ -863,6 +878,17 @@ window.saveProduct = async () => {
     bootstrap.Modal.getInstance(
       document.getElementById("productModal"),
     )?.hide();
+    products.load();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
+};
+
+window.deleteProduct = async (id) => {
+  if (!confirm("ต้องการลบสินค้านี้?")) return;
+  try {
+    await api.delete("/api/products/" + id);
+    toast("ลบสินค้าสำเร็จ", "warning");
     products.load();
   } catch (err) {
     toast(err.message, "danger");
@@ -1034,6 +1060,7 @@ const customers = {
         <td>
           <div class="d-flex gap-1">
             <button class="btn btn-outline-primary btn-sm" onclick="showCustomerModal(${c.id})"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteCustomer(${c.id})"><i class="bi bi-trash"></i></button>
           </div>
         </td>
       </tr>`,
@@ -1095,6 +1122,17 @@ window.saveCustomer = async () => {
     bootstrap.Modal.getInstance(
       document.getElementById("customerModal"),
     )?.hide();
+    customers.load();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
+};
+
+window.deleteCustomer = async (id) => {
+  if (!confirm("ต้องการลบลูกค้านี้?")) return;
+  try {
+    await api.delete("/api/customers/" + id);
+    toast("ลบลูกค้าสำเร็จ", "warning");
     customers.load();
   } catch (err) {
     toast(err.message, "danger");
@@ -2239,7 +2277,7 @@ function loadSettingsPage() {
   document.getElementById("sys-role").textContent =
     roleLabel(currentUser?.role) || "-";
   document.getElementById("sys-login-time").textContent =
-    new Date().toLocaleString("th-TH", {
+    new Date(localStorage.getItem("tws_login_time") || Date.now()).toLocaleString("th-TH", {
       timeStyle: "short",
       dateStyle: "short",
     });
@@ -2370,7 +2408,7 @@ const users = {
         <td>${u.active ? '<span class="badge bg-success">ใช้งาน</span>' : '<span class="badge bg-secondary">ระงับ</span>'}</td>
         <td>${fmt.date(u.created_at)}</td>
         <td>
-          ${u.username !== "admin" ? `<button class="btn btn-outline-primary btn-sm" onclick="showUserModal(${u.id})"><i class="bi bi-pencil"></i></button>` : "-"}
+          ${u.username !== "admin" ? `<button class="btn btn-outline-primary btn-sm" onclick="showUserModal(${u.id})"><i class="bi bi-pencil"></i></button> <button class="btn btn-outline-danger btn-sm" onclick="deleteUser(${u.id})"><i class="bi bi-trash"></i></button>` : "-"}
         </td>
       </tr>`,
       )
@@ -2415,6 +2453,17 @@ window.saveUser = async () => {
       toast("เพิ่มผู้ใช้สำเร็จ");
     }
     bootstrap.Modal.getInstance(document.getElementById("userModal"))?.hide();
+    users.load();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
+};
+
+window.deleteUser = async (id) => {
+  if (!confirm("ต้องการลบผู้ใช้นี้?")) return;
+  try {
+    await api.delete("/api/users/" + id);
+    toast("ลบผู้ใช้สำเร็จ", "warning");
     users.load();
   } catch (err) {
     toast(err.message, "danger");

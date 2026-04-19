@@ -673,6 +673,19 @@ app.post("/api/sales", auth(), (req, res) => {
   if (!customer_id || !order_date || !items?.length)
     return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
 
+  // Validate quantities
+  for (const item of items) {
+    if (!item.quantity || item.quantity <= 0)
+      return res.status(400).json({ error: "จำนวนสินค้าต้องมากกว่า 0" });
+    if (!item.unit_price || item.unit_price < 0)
+      return res.status(400).json({ error: "ราคาสินค้าไม่ถูกต้อง" });
+    const prod = db.prepare("SELECT stock, name FROM products WHERE id=?").get(item.product_id);
+    if (!prod)
+      return res.status(400).json({ error: "ไม่พบสินค้า" });
+    if (prod.stock < item.quantity)
+      return res.status(400).json({ error: `สินค้า "${prod.name}" สต็อกไม่พอ (คงเหลือ ${prod.stock})` });
+  }
+
   const cnt = db.prepare("SELECT COUNT(*) as c FROM sales_orders").get().c;
   const order_number = "SO" + String(cnt + 1).padStart(5, "0");
   const subtotals = items.map((i) => i.quantity * i.unit_price);
@@ -757,6 +770,14 @@ app.post("/api/payments", auth(), (req, res) => {
     .prepare("SELECT * FROM sales_orders WHERE id=?")
     .get(order_id);
   if (!order) return res.status(404).json({ error: "ไม่พบใบสั่งซื้อ" });
+
+  // Check overpayment
+  const currentPaid = db
+    .prepare("SELECT COALESCE(SUM(amount),0) as v FROM payments WHERE order_id=?")
+    .get(order_id).v;
+  const remaining = order.total_amount - currentPaid;
+  if (amount > remaining)
+    return res.status(400).json({ error: `ยอดชำระเกิน (ค้างชำระ ${remaining.toFixed(2)} บาท)` });
 
   const pay = db.transaction(() => {
     db.prepare(
@@ -987,6 +1008,8 @@ app.post("/api/users", auth(["admin"]), (req, res) => {
   const { username, password, name, role } = req.body;
   if (!username || !password || !name)
     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบ" });
+  if (password.length < 6)
+    return res.status(400).json({ error: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร" });
   try {
     const r = db
       .prepare(
@@ -1014,6 +1037,14 @@ app.put("/api/users/:id", auth(["admin"]), (req, res) => {
     );
   }
   res.json({ message: "แก้ไขสำเร็จ" });
+});
+
+app.delete("/api/users/:id", auth(["admin"]), (req, res) => {
+  const u = db.prepare("SELECT username FROM users WHERE id=?").get(req.params.id);
+  if (!u) return res.status(404).json({ error: "ไม่พบผู้ใช้" });
+  if (u.username === "admin") return res.status(400).json({ error: "ไม่สามารถลบ admin ได้" });
+  db.prepare("DELETE FROM users WHERE id=?").run(req.params.id);
+  res.json({ message: "ลบผู้ใช้สำเร็จ" });
 });
 
 // ─── Notifications ────────────────────────────────────────────────────────────
