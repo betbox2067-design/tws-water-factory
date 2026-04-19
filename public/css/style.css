@@ -1677,6 +1677,56 @@ code {
     flex: 0 0 100%;
     max-width: 100%;
   }
+
+  /* ── Topbar overflow fix ── */
+  #topbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .topbar-search-hint {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+  .topbar-search-hint span {
+    display: none;
+  }
+
+  /* ── Dashboard charts full width ── */
+  .chart-container {
+    min-height: 180px;
+  }
+
+  /* ── Report page responsive ── */
+  .report-filters {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .report-filters .d-flex {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .report-summary {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  /* ── Kanban on tablet ── */
+  .kanban-board {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* ── Table touch scroll ── */
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Sale/Delivery page header wrapping ── */
+  .page-header .btn {
+    font-size: 11.5px;
+    padding: 7px 12px;
+  }
 }
 
 /* ── Extra small screens ── */
@@ -1684,11 +1734,25 @@ code {
   .stat-card .stat-value {
     font-size: 1rem;
   }
+  .stat-card {
+    padding: 12px 14px;
+  }
+  .stat-card .stat-icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .stat-card .stat-label {
+    font-size: 10px;
+  }
   .quick-actions {
     grid-template-columns: repeat(2, 1fr);
   }
   .topbar-title {
     font-size: 12px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .btn-topbar {
     width: 30px;
@@ -1703,6 +1767,69 @@ code {
   .notif-item {
     padding: 10px 12px;
     font-size: 12px;
+  }
+
+  /* ── Topbar compact ── */
+  #topbar {
+    padding: 0 8px;
+    gap: 4px;
+  }
+  .topbar-search-hint {
+    display: none;
+  }
+
+  /* ── Content area tighter ── */
+  #content-area {
+    padding: 10px;
+    padding-bottom: 76px;
+  }
+
+  /* ── Kanban single column ── */
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+
+  /* ── Report stats ── */
+  .report-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* ── Page header stack ── */
+  .page-header {
+    gap: 6px;
+  }
+  .page-header h5 {
+    font-size: 13px;
+  }
+  .page-header .btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  /* ── Bottom nav tighter ── */
+  .bottom-nav {
+    height: 56px;
+  }
+  .bottom-nav-item i {
+    font-size: 18px;
+  }
+  .bottom-nav-item span {
+    font-size: 9px;
+  }
+
+  /* ── Modal full width ── */
+  .modal-dialog {
+    margin: 4px;
+  }
+  .modal-content {
+    border-radius: var(--r-lg);
+  }
+
+  /* ── Search modal ── */
+  .search-modal {
+    top: 8px;
+    width: 98%;
+    left: 1%;
   }
 }
 
@@ -2562,14 +2689,6 @@ code {
   .mat-summary {
     grid-template-columns: repeat(2, 1fr);
   }
-  .mat-grid {
-    grid-template-columns: 1fr;
-  }
-  .mat-view-toggle {
-    display: none;
-  }
-}
-
   .mat-grid {
     grid-template-columns: 1fr;
   }
