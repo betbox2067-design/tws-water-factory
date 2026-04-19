@@ -1,5 +1,5 @@
 /* =================================================================
-   TWS Enterprise Dashboard — Professional UI
+   TWS Enterprise Dashboard ï¿½ Professional UI
    Inspired by Linear, Vercel, and Stripe Dashboard
    No gimmicks. No rainbow. Just clean, precise design.
 ================================================================= */
@@ -88,7 +88,7 @@ body {
 }
 
 /* ==============================================================
-   LOGIN — SPLIT SCREEN
+   LOGIN ï¿½ SPLIT SCREEN
    Left: dark branded panel | Right: clean white form
 ============================================================== */
 #login-screen {
@@ -597,6 +597,28 @@ body {
 
 .sidebar-nav .nav-link.active i {
   color: var(--sb-txt-on);
+}
+
+/* Sub-nav items */
+.sidebar-nav .nav-sub .nav-link {
+  padding-left: 42px;
+  font-size: 12.5px;
+  font-weight: 400;
+  opacity: 0.75;
+  margin: 0 8px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+.sidebar-nav .nav-sub .nav-link i {
+  font-size: 13px;
+}
+.sidebar-nav .nav-sub .nav-link:hover {
+  opacity: 1;
+}
+.sidebar-nav .nav-sub .nav-link.active {
+  opacity: 1;
+  font-weight: 600;
+  padding-left: 40px;
 }
 
 /* Logout */
@@ -2253,7 +2275,7 @@ code {
 }
 
 /* ==============================================================
-   MATERIAL CARDS — Professional Visual Layout
+   MATERIAL CARDS ï¿½ Professional Visual Layout
 ============================================================== */
 
 /* -- Search box -- */
