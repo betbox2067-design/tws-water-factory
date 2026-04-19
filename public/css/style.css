@@ -1293,23 +1293,243 @@ code {
   }
 }
 
+/* ── Mobile overlay backdrop ── */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  z-index: 999;
+}
+.sidebar-backdrop.show {
+  display: block;
+}
+
 @media (max-width: 768px) {
+  /* ── Sidebar as drawer ── */
   #sidebar {
     position: fixed;
     inset-block: 0;
     left: 0;
+    width: var(--sidebar-w) !important;
     transform: translateX(-100%);
-    transition: transform var(--t);
+    transition: transform 200ms ease;
     z-index: 1000;
   }
   #sidebar.mobile-open {
     transform: translateX(0);
   }
-  #content-area {
-    padding: 14px 16px;
+  #sidebar.collapsed {
+    width: var(--sidebar-w) !important;
   }
-  .stat-value {
-    font-size: 1.25rem;
+  #sidebar.collapsed .brand-text,
+  #sidebar.collapsed .user-info,
+  #sidebar.collapsed .nav-link span,
+  #sidebar.collapsed .nav-section,
+  #sidebar.collapsed .sidebar-footer .btn-text {
+    display: unset;
+  }
+  #sidebar.collapsed .sidebar-brand {
+    justify-content: flex-start;
+    padding: 0 18px;
+  }
+  #sidebar.collapsed .sidebar-user {
+    justify-content: flex-start;
+    padding: 11px 16px;
+  }
+  #sidebar.collapsed .sidebar-nav .nav-link {
+    justify-content: flex-start;
+    padding: 9px 10px 9px 14px;
+    margin: 1px 8px;
+  }
+  #sidebar.collapsed .sidebar-footer {
+    padding: 12px 10px;
+  }
+
+  /* ── Topbar ── */
+  #topbar {
+    padding: 0 12px;
+    gap: 6px;
+  }
+  .topbar-title {
+    font-size: 13px;
+  }
+  .topbar-clock {
+    display: none;
+  }
+  .topbar-search-hint span,
+  .topbar-search-hint kbd {
+    display: none;
+  }
+
+  /* ── Content area ── */
+  #content-area {
+    padding: 12px;
+  }
+
+  /* ── Stat cards ── */
+  .stat-card {
+    padding: 14px 14px;
+  }
+  .stat-card .stat-value {
+    font-size: 1.15rem;
+  }
+  .stat-card .stat-label {
+    font-size: 10.5px;
+  }
+  .stat-card .stat-icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  /* ── Quick actions ── */
+  .quick-actions {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .quick-action {
+    padding: 10px 8px;
+  }
+  .qa-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .qa-label {
+    font-size: 10.5px;
+  }
+
+  /* ── Page header ── */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .page-header .d-flex {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .page-header input[style*="width: 200px"] {
+    width: 100% !important;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ── Tables ── */
+  .table th,
+  .table td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .table th {
+    font-size: 9.5px;
+  }
+
+  /* ── Charts row ── */
+  .row .col-md-8,
+  .row .col-md-4,
+  .row .col-md-7,
+  .row .col-md-5 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  /* ── Kanban ── */
+  .kanban-board {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* ── Notification dropdown ── */
+  .notif-dropdown {
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 0 0 var(--r-lg) var(--r-lg);
+  }
+
+  /* ── Search modal ── */
+  .search-modal {
+    top: 10px;
+    width: 96%;
+  }
+
+  /* ── Modals ── */
+  .modal-dialog {
+    margin: 8px;
+  }
+  .modal-body {
+    padding: 16px;
+  }
+  .modal-footer {
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .modal-footer .btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ── Buttons touch-friendly ── */
+  .btn-sm {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+
+  /* ── Forms ── */
+  .form-control,
+  .form-select {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  /* ── Report tabs ── */
+  .nav-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-tabs .nav-link {
+    white-space: nowrap;
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+
+  /* ── Settings page ── */
+  .settings-section .card-body .row .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* ── Extra small screens ── */
+@media (max-width: 480px) {
+  .stat-card .stat-value {
+    font-size: 1rem;
+  }
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .topbar-title {
+    font-size: 12px;
+  }
+  .btn-topbar {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+  .sidebar-toggle {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+  .notif-item {
+    padding: 10px 12px;
+    font-size: 12px;
   }
 }
 

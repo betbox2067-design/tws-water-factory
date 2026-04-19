@@ -263,12 +263,33 @@ document.querySelectorAll(".sidebar-nav .nav-link").forEach((a) => {
   a.addEventListener("click", (e) => {
     e.preventDefault();
     navigate(a.dataset.page);
+    closeMobileSidebar();
   });
 });
 
+function isMobile() {
+  return window.innerWidth <= 768;
+}
+
+function closeMobileSidebar() {
+  if (isMobile()) {
+    document.getElementById("sidebar").classList.remove("mobile-open");
+    document.getElementById("sidebar-backdrop").classList.remove("show");
+  }
+}
+
 document.getElementById("sidebar-toggle").addEventListener("click", () => {
-  document.getElementById("sidebar").classList.toggle("collapsed");
+  const sb = document.getElementById("sidebar");
+  const bd = document.getElementById("sidebar-backdrop");
+  if (isMobile()) {
+    sb.classList.toggle("mobile-open");
+    bd.classList.toggle("show");
+  } else {
+    sb.classList.toggle("collapsed");
+  }
 });
+
+document.getElementById("sidebar-backdrop").addEventListener("click", closeMobileSidebar);
 
 // ─── DASHBOARD ───────────────────────────────────────────
 const dashboard = {
