@@ -1,0 +1,5 @@
+node_modules/
+tws.db
+*.db-shm
+*.db-wal
+.env

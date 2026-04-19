@@ -1,0 +1,2350 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TWS - ระบบจัดการโรงงานผลิตน้ำดื่ม</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <!-- ═══════════════════ LOGIN SCREEN ═══════════════════ -->
+    <div id="login-screen">
+      <!-- Left branding panel -->
+      <div class="login-panel-left">
+        <div class="login-left-top">
+          <div class="login-left-icon"><i class="bi bi-droplet-fill"></i></div>
+          <div>
+            <div class="login-left-wordmark">TWS</div>
+            <div class="login-left-tagline">WATER FACTORY</div>
+          </div>
+        </div>
+
+        <div class="login-left-body">
+          <h2 class="login-left-heading">
+            ระบบจัดการ<br /><em>โรงงานน้ำดื่ม</em><br />ครบวงจร
+          </h2>
+          <p class="login-left-sub">
+            ควบคุมทุกกระบวนการตั้งแต่วัตถุดิบ การผลิต การขาย<br />
+            จนถึงการจัดส่ง ในระบบเดียว
+          </p>
+          <div class="login-feats">
+            <div class="login-feat">
+              <div class="login-feat-icon"><i class="bi bi-boxes"></i></div>
+              <div class="login-feat-info">
+                <strong>จัดการสต็อกและวัตถุดิบ</strong>
+                <span>ติดตามสินค้าและวัตถุดิบแบบ Real-time</span>
+              </div>
+            </div>
+            <div class="login-feat">
+              <div class="login-feat-icon"><i class="bi bi-cart-fill"></i></div>
+              <div class="login-feat-info">
+                <strong>บริหารการขายและลูกค้า</strong>
+                <span>จัดการใบสั่งซื้อ ติดตามการชำระเงิน</span>
+              </div>
+            </div>
+            <div class="login-feat">
+              <div class="login-feat-icon">
+                <i class="bi bi-bar-chart-fill"></i>
+              </div>
+              <div class="login-feat-info">
+                <strong>รายงานและวิเคราะห์ธุรกิจ</strong>
+                <span>แดชบอร์ดและรายงานครบถ้วน</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-left-foot">© 2025 TWS Water Factory System</div>
+      </div>
+
+      <!-- Right form panel -->
+      <div class="login-panel-right">
+        <div class="login-box">
+          <div class="login-form-brand">
+            <div class="login-form-brand-icon">
+              <i class="bi bi-droplet-fill"></i>
+            </div>
+            <div class="login-form-brand-text">
+              <h2>TWS</h2>
+              <p>ระบบจัดการโรงงานผลิตน้ำดื่ม</p>
+            </div>
+          </div>
+
+          <div class="login-form-welcome">
+            <h3>ยินดีต้อนรับกลับ</h3>
+            <p>กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+          </div>
+
+          <form id="login-form">
+            <div class="mb-3">
+              <label class="form-label">ชื่อผู้ใช้งาน</label>
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="bi bi-person-fill"></i
+                ></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="login-username"
+                  placeholder="กรอกชื่อผู้ใช้"
+                  required
+                  autocomplete="username"
+                />
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">รหัสผ่าน</label>
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="bi bi-lock-fill"></i
+                ></span>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="login-password"
+                  placeholder="กรอกรหัสผ่าน"
+                  required
+                  autocomplete="current-password"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  id="toggle-password"
+                >
+                  <i class="bi bi-eye-fill"></i>
+                </button>
+              </div>
+            </div>
+            <div id="login-error" class="alert alert-danger d-none"></div>
+            <button
+              type="submit"
+              class="btn btn-primary btn-lg w-100"
+              id="login-btn"
+            >
+              <i class="bi bi-box-arrow-in-right me-1"></i>เข้าสู่ระบบ
+            </button>
+          </form>
+
+          <div class="login-footer">
+            <small>TWS Water Factory System v1.0</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ MAIN APP ═══════════════════ -->
+    <div id="app-screen" style="display: none">
+      <!-- Sidebar -->
+      <nav id="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-icon"><i class="bi bi-droplet-fill"></i></div>
+          <div class="brand-text">
+            <div class="brand-name">TWS</div>
+            <div class="brand-sub">Water Factory</div>
+          </div>
+        </div>
+
+        <div class="sidebar-user">
+          <div class="user-avatar"><i class="bi bi-person-circle"></i></div>
+          <div class="user-info">
+            <div class="user-name" id="user-name"></div>
+            <div class="user-role badge" id="user-role-badge"></div>
+          </div>
+        </div>
+
+        <ul class="sidebar-nav">
+          <li class="nav-section">หน้าหลัก</li>
+          <li>
+            <a href="#" class="nav-link" data-page="dashboard"
+              ><i class="bi bi-speedometer2"></i><span>แดชบอร์ด</span></a
+            >
+          </li>
+
+          <li class="nav-section">สต็อก & การผลิต</li>
+          <li>
+            <a href="#" class="nav-link" data-page="materials"
+              ><i class="bi bi-boxes"></i><span>วัตถุดิบ</span></a
+            >
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-page="products"
+              ><i class="bi bi-droplet-half"></i><span>สินค้า</span></a
+            >
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-page="production"
+              ><i class="bi bi-gear-wide-connected"></i><span>การผลิต</span></a
+            >
+          </li>
+
+          <li class="nav-section">การขาย</li>
+          <li>
+            <a href="#" class="nav-link" data-page="customers"
+              ><i class="bi bi-people-fill"></i><span>ลูกค้า</span></a
+            >
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-page="sales"
+              ><i class="bi bi-cart-fill"></i><span>การขาย</span></a
+            >
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-page="delivery"
+              ><i class="bi bi-truck-front-fill"></i><span>การจัดส่ง</span></a
+            >
+          </li>
+
+          <li class="nav-section">รายงาน</li>
+          <li>
+            <a href="#" class="nav-link" data-page="reports"
+              ><i class="bi bi-bar-chart-fill"></i><span>รายงาน</span></a
+            >
+          </li>
+
+          <li class="nav-section">บัญชีของฉัน</li>
+          <li>
+            <a href="#" class="nav-link" data-page="settings"
+              ><i class="bi bi-gear-fill"></i><span>ตั้งค่า</span></a
+            >
+          </li>
+
+          <li class="nav-section admin-only">จัดการระบบ</li>
+          <li class="admin-only">
+            <a href="#" class="nav-link" data-page="users"
+              ><i class="bi bi-shield-lock-fill"></i><span>ผู้ใช้งาน</span></a
+            >
+          </li>
+        </ul>
+
+        <div class="sidebar-footer">
+          <button id="logout-btn">
+            <i class="bi bi-box-arrow-right"></i
+            ><span class="btn-text">ออกจากระบบ</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <div id="main-content">
+        <!-- Topbar -->
+        <div id="topbar">
+          <button class="sidebar-toggle" id="sidebar-toggle">
+            <i class="bi bi-list"></i>
+          </button>
+          <h5 class="topbar-title mb-0" id="page-title">แดชบอร์ด</h5>
+          <div class="topbar-actions">
+            <div class="topbar-clock">
+              <i class="bi bi-clock"></i><span id="current-datetime"></span>
+            </div>
+            <button
+              class="btn-topbar topbar-search-hint"
+              onclick="openSearch()"
+              title="ค้นหา (กด /)"
+            >
+              <i class="bi bi-search"></i><span>ค้นหา</span><kbd>/</kbd>
+            </button>
+            <div class="notif-wrap">
+              <button
+                class="btn-topbar"
+                id="notif-btn"
+                onclick="toggleNotif()"
+                title="การแจ้งเตือน"
+              >
+                <i class="bi bi-bell"></i>
+                <span class="notif-badge" id="notif-count" style="display: none"
+                  >0</span
+                >
+              </button>
+              <div class="notif-dropdown" id="notif-dropdown">
+                <div class="notif-header">
+                  <span><i class="bi bi-bell-fill me-1"></i>การแจ้งเตือน</span>
+                  <button onclick="toggleNotif()">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
+                <div id="notif-list" class="notif-list"></div>
+              </div>
+            </div>
+            <button
+              class="btn-topbar"
+              onclick="location.reload()"
+              title="รีเฟรช"
+            >
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pages -->
+        <div id="content-area">
+          <!-- ─── DASHBOARD ─── -->
+          <div class="page" id="page-dashboard">
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-3">
+                <div class="stat-card stat-primary">
+                  <div class="stat-icon">
+                    <i class="bi bi-currency-exchange"></i>
+                  </div>
+                  <div class="stat-value" id="stat-today-sales">฿0</div>
+                  <div class="stat-label">ยอดขายวันนี้</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card stat-success">
+                  <div class="stat-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                  </div>
+                  <div class="stat-value" id="stat-month-sales">฿0</div>
+                  <div class="stat-label">ยอดขายเดือนนี้</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card stat-warning">
+                  <div class="stat-icon">
+                    <i class="bi bi-clock-history"></i>
+                  </div>
+                  <div class="stat-value" id="stat-pending-orders">0</div>
+                  <div class="stat-label">ใบสั่งซื้อค้างอยู่</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card stat-danger">
+                  <div class="stat-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div class="stat-value" id="stat-unpaid">฿0</div>
+                  <div class="stat-label">ยอดค้างชำระรวม</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card stat-info">
+                  <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                  <div class="stat-value" id="stat-customers">0</div>
+                  <div class="stat-label">ลูกค้าทั้งหมด</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card stat-secondary">
+                  <div class="stat-icon">
+                    <i class="bi bi-droplet-half"></i>
+                  </div>
+                  <div class="stat-value" id="stat-products">0</div>
+                  <div class="stat-label">สินค้าทั้งหมด</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card stat-orange">
+                  <div class="stat-icon">
+                    <i class="bi bi-gear-wide-connected"></i>
+                  </div>
+                  <div class="stat-value" id="stat-production">0</div>
+                  <div class="stat-label">ใบสั่งผลิตค้างอยู่</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card stat-danger">
+                  <div class="stat-icon"><i class="bi bi-boxes"></i></div>
+                  <div class="stat-value" id="stat-low-materials">0</div>
+                  <div class="stat-label">วัตถุดิบใกล้หมด</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions mb-4">
+              <div
+                class="quick-action"
+                onclick="showSaleModal()"
+                title="สร้างใบสั่งซื้อ"
+              >
+                <div class="qa-icon blue">
+                  <i class="bi bi-plus-circle-fill"></i>
+                </div>
+                <div class="qa-label">สร้างใบขาย</div>
+              </div>
+              <div
+                class="quick-action"
+                onclick="showProductionModal()"
+                title="สั่งผลิต"
+              >
+                <div class="qa-icon violet">
+                  <i class="bi bi-gear-wide-connected"></i>
+                </div>
+                <div class="qa-label">สั่งผลิต</div>
+              </div>
+              <div
+                class="quick-action"
+                onclick="navigate('materials')"
+                title="จัดการวัตถุดิบ"
+              >
+                <div class="qa-icon amber"><i class="bi bi-boxes"></i></div>
+                <div class="qa-label">วัตถุดิบ</div>
+              </div>
+              <div
+                class="quick-action"
+                onclick="showCustomerModal()"
+                title="เพิ่มลูกค้า"
+              >
+                <div class="qa-icon sky">
+                  <i class="bi bi-person-plus-fill"></i>
+                </div>
+                <div class="qa-label">เพิ่มลูกค้า</div>
+              </div>
+              <div
+                class="quick-action"
+                onclick="navigate('reports')"
+                title="ดูรายงาน"
+              >
+                <div class="qa-icon green">
+                  <i class="bi bi-bar-chart-fill"></i>
+                </div>
+                <div class="qa-label">รายงาน</div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-8">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <i class="bi bi-bar-chart-fill me-2"></i>ยอดขาย 7
+                    วันย้อนหลัง
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-sales"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <i class="bi bi-trophy-fill me-2"></i>สินค้าขายดีเดือนนี้
+                  </div>
+                  <div class="card-body">
+                    <canvas id="chart-top-products"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-7">
+                <div class="card h-100">
+                  <div
+                    class="card-header d-flex justify-content-between align-items-center"
+                  >
+                    <span
+                      ><i class="bi bi-receipt me-2"></i>รายการขายล่าสุด</span
+                    >
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-outline-primary"
+                      onclick="navigate('sales')"
+                      >ดูทั้งหมด</a
+                    >
+                  </div>
+                  <div class="card-body p-0">
+                    <div class="table-responsive">
+                      <table class="table table-hover mb-0">
+                        <thead>
+                          <tr>
+                            <th>เลขที่</th>
+                            <th>ลูกค้า</th>
+                            <th>ยอดรวม</th>
+                            <th>สถานะ</th>
+                          </tr>
+                        </thead>
+                        <tbody id="recent-orders-tbody"></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="card mb-3">
+                  <div class="card-header">
+                    <i class="bi bi-exclamation-triangle me-2"></i>การแจ้งเตือน
+                  </div>
+                  <div class="card-body p-2" id="dash-alerts">
+                    <div class="text-center text-muted py-3">
+                      <small>กำลังโหลด...</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-header">
+                    <i class="bi bi-activity me-2"></i>กิจกรรมล่าสุด
+                  </div>
+                  <div class="card-body p-3" id="dash-activity">
+                    <div class="text-center text-muted py-3">
+                      <small>กำลังโหลด...</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── MATERIALS ─── -->
+          <div class="page d-none" id="page-materials">
+            <div class="page-header">
+              <h5 class="mb-0"><i class="bi bi-boxes me-2"></i>วัตถุดิบ</h5>
+              <div class="d-flex gap-2">
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  id="material-search"
+                  placeholder="ค้นหา..."
+                  style="width: 200px"
+                  oninput="filterMaterials()"
+                />
+                <button
+                  class="btn btn-primary btn-sm manager-only"
+                  onclick="showMaterialModal()"
+                >
+                  <i class="bi bi-plus-lg me-1"></i>เพิ่มวัตถุดิบ
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table
+                    class="table table-hover align-middle mb-0"
+                    id="materials-table"
+                  >
+                    <thead class="table-dark">
+                      <tr>
+                        <th>รหัส</th>
+                        <th>ชื่อวัตถุดิบ</th>
+                        <th>หน่วย</th>
+                        <th class="text-end">คงเหลือ</th>
+                        <th class="text-end">ขั้นต่ำ</th>
+                        <th class="text-end">ราคา/หน่วย</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="materials-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── PRODUCTS ─── -->
+          <div class="page d-none" id="page-products">
+            <div class="page-header">
+              <h5 class="mb-0">
+                <i class="bi bi-droplet-half me-2"></i>สินค้า
+              </h5>
+              <div class="d-flex gap-2">
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  id="product-search"
+                  placeholder="ค้นหา..."
+                  style="width: 200px"
+                  oninput="filterProducts()"
+                />
+                <button
+                  class="btn btn-primary btn-sm manager-only"
+                  onclick="showProductModal()"
+                >
+                  <i class="bi bi-plus-lg me-1"></i>เพิ่มสินค้า
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>รหัส</th>
+                        <th>ชื่อสินค้า</th>
+                        <th>ขนาด</th>
+                        <th>หน่วย</th>
+                        <th class="text-end">ราคาขาย</th>
+                        <th class="text-end">ต้นทุน</th>
+                        <th class="text-end">สต็อก</th>
+                        <th class="text-end">ขั้นต่ำ</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="products-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── PRODUCTION ─── -->
+          <div class="page d-none" id="page-production">
+            <div class="page-header">
+              <h5 class="mb-0">
+                <i class="bi bi-gear-wide-connected me-2"></i>การผลิต
+              </h5>
+              <div class="d-flex gap-2 align-items-center">
+                <div class="view-toggle">
+                  <button
+                    class="view-toggle-btn active"
+                    id="prod-view-table"
+                    onclick="setProdView('table')"
+                  >
+                    ตาราง
+                  </button>
+                  <button
+                    class="view-toggle-btn"
+                    id="prod-view-kanban"
+                    onclick="setProdView('kanban')"
+                  >
+                    Kanban
+                  </button>
+                </div>
+                <select
+                  class="form-select form-select-sm"
+                  id="production-filter"
+                  onchange="loadProduction()"
+                  style="width: 160px"
+                >
+                  <option value="">ทุกสถานะ</option>
+                  <option value="pending">รอดำเนินการ</option>
+                  <option value="in_progress">กำลังผลิต</option>
+                  <option value="completed">เสร็จแล้ว</option>
+                  <option value="cancelled">ยกเลิก</option>
+                </select>
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="showProductionModal()"
+                >
+                  <i class="bi bi-plus-lg me-1"></i>สั่งผลิต
+                </button>
+              </div>
+            </div>
+            <!-- Table View -->
+            <div id="prod-table-view">
+              <div class="card">
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>#</th>
+                          <th>สินค้า</th>
+                          <th class="text-end">สั่งผลิต</th>
+                          <th class="text-end">ผลิตแล้ว</th>
+                          <th>สถานะ</th>
+                          <th>สร้างโดย</th>
+                          <th>วันที่</th>
+                          <th>จัดการ</th>
+                        </tr>
+                      </thead>
+                      <tbody id="production-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Kanban View -->
+            <div id="prod-kanban-view" class="d-none">
+              <div class="kanban-board" id="kanban-board"></div>
+            </div>
+          </div>
+
+          <!-- ─── CUSTOMERS ─── -->
+          <div class="page d-none" id="page-customers">
+            <div class="page-header">
+              <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>ลูกค้า</h5>
+              <div class="d-flex gap-2">
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  id="customer-search"
+                  placeholder="ค้นหา..."
+                  style="width: 200px"
+                  oninput="filterCustomers()"
+                />
+                <select
+                  class="form-select form-select-sm"
+                  id="customer-type-filter"
+                  onchange="filterCustomers()"
+                  style="width: 140px"
+                >
+                  <option value="">ทุกประเภท</option>
+                  <option value="retail">ขายปลีก</option>
+                  <option value="wholesale">ขายส่ง</option>
+                  <option value="corporate">บริษัท</option>
+                  <option value="distributor">ตัวแทน</option>
+                </select>
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="showCustomerModal()"
+                >
+                  <i class="bi bi-plus-lg me-1"></i>เพิ่มลูกค้า
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>รหัส</th>
+                        <th>ชื่อลูกค้า</th>
+                        <th>โทรศัพท์</th>
+                        <th>ประเภท</th>
+                        <th class="text-end">วงเงิน</th>
+                        <th>ที่อยู่</th>
+                        <th>จัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="customers-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── SALES ─── -->
+          <div class="page d-none" id="page-sales">
+            <div class="page-header">
+              <h5 class="mb-0"><i class="bi bi-cart-fill me-2"></i>การขาย</h5>
+              <div class="d-flex gap-2 flex-wrap">
+                <input
+                  type="date"
+                  class="form-control form-control-sm"
+                  id="sales-from"
+                  style="width: 140px"
+                />
+                <input
+                  type="date"
+                  class="form-control form-control-sm"
+                  id="sales-to"
+                  style="width: 140px"
+                />
+                <select
+                  class="form-select form-select-sm"
+                  id="sales-status-filter"
+                  style="width: 150px"
+                >
+                  <option value="">ทุกสถานะ</option>
+                  <option value="pending">รอยืนยัน</option>
+                  <option value="confirmed">ยืนยันแล้ว</option>
+                  <option value="delivered">จัดส่งแล้ว</option>
+                  <option value="paid">ชำระแล้ว</option>
+                  <option value="cancelled">ยกเลิก</option>
+                </select>
+                <button
+                  class="btn btn-outline-secondary btn-sm"
+                  onclick="loadSales()"
+                >
+                  <i class="bi bi-search"></i>
+                </button>
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="showSaleModal()"
+                >
+                  <i class="bi bi-plus-lg me-1"></i>สร้างใบขาย
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>เลขที่</th>
+                        <th>ลูกค้า</th>
+                        <th>วันที่</th>
+                        <th class="text-end">ยอดรวม</th>
+                        <th class="text-end">ชำระแล้ว</th>
+                        <th class="text-end">คงค้าง</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="sales-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── DELIVERY ─── -->
+          <div class="page d-none" id="page-delivery">
+            <div class="page-header">
+              <h5 class="mb-0">
+                <i class="bi bi-truck-front-fill me-2"></i>การจัดส่ง
+              </h5>
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="showDeliveryModal()"
+              >
+                <i class="bi bi-plus-lg me-1"></i>สร้างใบส่งของ
+              </button>
+            </div>
+            <div class="card">
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>ใบสั่งซื้อ</th>
+                        <th>ลูกค้า</th>
+                        <th>ที่อยู่</th>
+                        <th>คนขับ</th>
+                        <th>ทะเบียน</th>
+                        <th>วันจัดส่ง</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="delivery-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── REPORTS ─── -->
+          <div class="page d-none" id="page-reports">
+            <div class="page-header">
+              <h5 class="mb-0">
+                <i class="bi bi-bar-chart-fill me-2"></i>รายงาน
+              </h5>
+            </div>
+            <ul class="nav nav-tabs mb-3" id="report-tabs">
+              <li class="nav-item">
+                <a class="nav-link active" href="#" data-report="sales"
+                  >การขาย</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-report="inventory"
+                  >สต็อกสินค้า</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-report="production"
+                  >การผลิต</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-report="profit"
+                  >กำไร-ขาดทุน</a
+                >
+              </li>
+            </ul>
+
+            <!-- Sales Report -->
+            <div id="report-sales">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="row g-2 align-items-end">
+                    <div class="col-auto">
+                      <label class="form-label mb-1">ตั้งแต่</label
+                      ><input
+                        type="date"
+                        class="form-control form-control-sm"
+                        id="rpt-sales-from"
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <label class="form-label mb-1">ถึง</label
+                      ><input
+                        type="date"
+                        class="form-control form-control-sm"
+                        id="rpt-sales-to"
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <button
+                        class="btn btn-primary btn-sm"
+                        onclick="loadReportSales()"
+                      >
+                        <i class="bi bi-search me-1"></i>ค้นหา
+                      </button>
+                    </div>
+                    <div class="col-auto">
+                      <button
+                        class="btn btn-outline-secondary btn-sm"
+                        onclick="exportCSV('sales')"
+                      >
+                        <i class="bi bi-download me-1"></i>Export CSV
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                  <div class="stat-card stat-primary">
+                    <div class="stat-value" id="rpt-total-orders">0</div>
+                    <div class="stat-label">จำนวนใบสั่งซื้อ</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-success">
+                    <div class="stat-value" id="rpt-revenue">฿0</div>
+                    <div class="stat-label">รายได้รวม</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-info">
+                    <div class="stat-value" id="rpt-paid">฿0</div>
+                    <div class="stat-label">ชำระแล้ว</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-warning">
+                    <div class="stat-value" id="rpt-unpaid">฿0</div>
+                    <div class="stat-label">ค้างชำระ</div>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-7">
+                  <div class="card">
+                    <div class="card-header">ยอดขายรายวัน</div>
+                    <div class="card-body">
+                      <canvas id="rpt-sales-chart"></canvas>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-5">
+                  <div class="card">
+                    <div class="card-header">ยอดขายตามสินค้า (Top 5)</div>
+                    <div class="card-body">
+                      <canvas id="rpt-product-chart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header">สินค้าขายดี</div>
+                    <div class="card-body p-0">
+                      <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th>สินค้า</th>
+                              <th class="text-end">จำนวน</th>
+                              <th class="text-end">ยอดขาย</th>
+                            </tr>
+                          </thead>
+                          <tbody id="rpt-product-tbody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header">ลูกค้า Top 10</div>
+                    <div class="card-body p-0">
+                      <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th>ลูกค้า</th>
+                              <th class="text-end">ใบสั่งซื้อ</th>
+                              <th class="text-end">ยอดซื้อ</th>
+                            </tr>
+                          </thead>
+                          <tbody id="rpt-customer-tbody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inventory Report -->
+            <div id="report-inventory" class="d-none">
+              <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                  <div class="stat-card stat-primary">
+                    <div class="stat-value" id="inv-product-count">0</div>
+                    <div class="stat-label">จำนวนสินค้า SKU</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-success">
+                    <div class="stat-value" id="inv-product-value">฿0</div>
+                    <div class="stat-label">มูลค่าสินค้า</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-info">
+                    <div class="stat-value" id="inv-material-count">0</div>
+                    <div class="stat-label">จำนวนวัตถุดิบ</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-warning">
+                    <div class="stat-value" id="inv-material-value">฿0</div>
+                    <div class="stat-label">มูลค่าวัตถุดิบ</div>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header text-danger fw-bold">
+                      <i class="bi bi-exclamation-triangle-fill me-1"></i
+                      >สินค้าสต็อกต่ำ
+                    </div>
+                    <div class="card-body p-0">
+                      <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th>สินค้า</th>
+                              <th class="text-end">คงเหลือ</th>
+                              <th class="text-end">ขั้นต่ำ</th>
+                            </tr>
+                          </thead>
+                          <tbody id="inv-low-products-tbody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header text-danger fw-bold">
+                      <i class="bi bi-exclamation-triangle-fill me-1"></i
+                      >วัตถุดิบใกล้หมด
+                    </div>
+                    <div class="card-body p-0">
+                      <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th>วัตถุดิบ</th>
+                              <th class="text-end">คงเหลือ</th>
+                              <th class="text-end">ขั้นต่ำ</th>
+                            </tr>
+                          </thead>
+                          <tbody id="inv-low-materials-tbody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-header">สินค้าทั้งหมด</div>
+                    <div class="card-body p-0">
+                      <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th>รหัส</th>
+                              <th>สินค้า</th>
+                              <th class="text-end">สต็อก</th>
+                              <th class="text-end">ต้นทุน/หน่วย</th>
+                              <th class="text-end">มูลค่า</th>
+                            </tr>
+                          </thead>
+                          <tbody id="inv-products-tbody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Production Report -->
+            <div id="report-production" class="d-none">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="row g-2 align-items-end">
+                    <div class="col-auto">
+                      <label class="form-label mb-1">ตั้งแต่</label
+                      ><input
+                        type="date"
+                        class="form-control form-control-sm"
+                        id="rpt-prod-from"
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <label class="form-label mb-1">ถึง</label
+                      ><input
+                        type="date"
+                        class="form-control form-control-sm"
+                        id="rpt-prod-to"
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <button
+                        class="btn btn-primary btn-sm"
+                        onclick="loadReportProduction()"
+                      >
+                        <i class="bi bi-search me-1"></i>ค้นหา
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                  <div class="stat-card stat-primary">
+                    <div class="stat-value" id="prod-total">0</div>
+                    <div class="stat-label">ใบสั่งผลิตทั้งหมด</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-success">
+                    <div class="stat-value" id="prod-completed">0</div>
+                    <div class="stat-label">เสร็จแล้ว</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-info">
+                    <div class="stat-value" id="prod-planned">0</div>
+                    <div class="stat-label">จำนวนที่สั่งผลิต</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-warning">
+                    <div class="stat-value" id="prod-produced">0</div>
+                    <div class="stat-label">จำนวนที่ผลิตแล้ว</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">รายการผลิต</div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>สินค้า</th>
+                          <th class="text-end">สั่งผลิต</th>
+                          <th class="text-end">ผลิตแล้ว</th>
+                          <th>สถานะ</th>
+                          <th>วันที่</th>
+                        </tr>
+                      </thead>
+                      <tbody id="rpt-prod-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profit Report -->
+            <div id="report-profit" class="d-none">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <div class="row g-2 align-items-end">
+                    <div class="col-auto">
+                      <label class="form-label mb-1">ตั้งแต่</label>
+                      <input
+                        type="date"
+                        class="form-control form-control-sm"
+                        id="rpt-profit-from"
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <label class="form-label mb-1">ถึง</label>
+                      <input
+                        type="date"
+                        class="form-control form-control-sm"
+                        id="rpt-profit-to"
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <button
+                        class="btn btn-primary btn-sm"
+                        onclick="loadReportProfit()"
+                      >
+                        <i class="bi bi-search me-1"></i>ค้นหา
+                      </button>
+                    </div>
+                    <div class="col-auto">
+                      <button
+                        class="btn btn-outline-secondary btn-sm"
+                        onclick="exportCSV('profit')"
+                      >
+                        <i class="bi bi-download me-1"></i>Export CSV
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                  <div class="stat-card stat-success">
+                    <div class="stat-value" id="profit-revenue">฿0</div>
+                    <div class="stat-label">รายได้รวม</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-warning">
+                    <div class="stat-value" id="profit-cost">฿0</div>
+                    <div class="stat-label">ต้นทุนรวม</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-primary">
+                    <div class="stat-value" id="profit-gross">฿0</div>
+                    <div class="stat-label">กำไรขั้นต้น</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card stat-info">
+                    <div class="stat-value" id="profit-margin">0%</div>
+                    <div class="stat-label">อัตรากำไร</div>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-5">
+                  <div class="card h-100">
+                    <div class="card-header">สัดส่วนรายได้ vs ต้นทุน</div>
+                    <div class="card-body">
+                      <canvas id="rpt-profit-chart"></canvas>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-7">
+                  <div class="card h-100">
+                    <div class="card-header">กำไรรายสินค้า</div>
+                    <div class="card-body p-0">
+                      <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th>สินค้า</th>
+                              <th class="text-end">ขาย (ถัง)</th>
+                              <th class="text-end">รายได้</th>
+                              <th class="text-end">ต้นทุน</th>
+                              <th class="text-end">กำไร</th>
+                              <th class="text-end">มาร์จิ้น</th>
+                            </tr>
+                          </thead>
+                          <tbody id="rpt-profit-tbody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── USERS ─── -->
+          <div class="page d-none" id="page-users">
+            <div class="page-header">
+              <h5 class="mb-0">
+                <i class="bi bi-shield-lock-fill me-2"></i>จัดการผู้ใช้งาน
+              </h5>
+              <button class="btn btn-primary btn-sm" onclick="showUserModal()">
+                <i class="bi bi-plus-lg me-1"></i>เพิ่มผู้ใช้
+              </button>
+            </div>
+            <div class="card">
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>#</th>
+                        <th>ชื่อผู้ใช้</th>
+                        <th>ชื่อ-นามสกุล</th>
+                        <th>บทบาท</th>
+                        <th>สถานะ</th>
+                        <th>วันที่สร้าง</th>
+                        <th>จัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="users-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── SETTINGS ─── -->
+          <div class="page d-none" id="page-settings">
+            <div class="page-header">
+              <h5 class="mb-0">
+                <i class="bi bi-gear-fill me-2"></i>ตั้งค่าระบบ
+              </h5>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="settings-section">
+                  <div class="settings-section-header">
+                    <i class="bi bi-building"></i>ข้อมูลบริษัท
+                  </div>
+                  <div class="settings-section-body">
+                    <div class="mb-3">
+                      <label class="form-label">ชื่อบริษัท</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="set-company"
+                        placeholder="TWS Water Factory"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">ที่อยู่</label>
+                      <textarea
+                        class="form-control"
+                        id="set-address"
+                        rows="2"
+                        placeholder="ที่อยู่บริษัท"
+                      ></textarea>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">โทรศัพท์</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="set-phone"
+                        placeholder="0x-xxxx-xxxx"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">เลขที่ภาษี</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="set-tax"
+                        placeholder="เลขประจำตัวผู้เสียภาษี"
+                      />
+                    </div>
+                    <button
+                      class="btn btn-primary btn-sm"
+                      onclick="saveCompanySettings()"
+                    >
+                      <i class="bi bi-save me-1"></i>บันทึกข้อมูลบริษัท
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="settings-section mb-3">
+                  <div class="settings-section-header">
+                    <i class="bi bi-key-fill"></i>เปลี่ยนรหัสผ่าน
+                  </div>
+                  <div class="settings-section-body">
+                    <div class="mb-3">
+                      <label class="form-label"
+                        >รหัสผ่านปัจจุบัน
+                        <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="set-cur-pass"
+                        autocomplete="current-password"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        >รหัสผ่านใหม่ <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="set-new-pass"
+                        autocomplete="new-password"
+                        placeholder="อย่างน้อย 6 ตัวอักษร"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        >ยืนยันรหัสผ่านใหม่
+                        <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="set-confirm-pass"
+                        autocomplete="new-password"
+                      />
+                    </div>
+                    <button
+                      class="btn btn-warning btn-sm"
+                      onclick="changePassword()"
+                    >
+                      <i class="bi bi-lock-fill me-1"></i>เปลี่ยนรหัสผ่าน
+                    </button>
+                  </div>
+                </div>
+                <div class="settings-section">
+                  <div class="settings-section-header">
+                    <i class="bi bi-info-circle-fill"></i>ข้อมูลระบบ
+                  </div>
+                  <div class="settings-section-body">
+                    <table class="table table-sm mb-0">
+                      <tr>
+                        <td class="text-muted">เวอร์ชั่น</td>
+                        <td class="fw-semibold">TWS v2.0</td>
+                      </tr>
+                      <tr>
+                        <td class="text-muted">ผู้ใช้งาน</td>
+                        <td class="fw-semibold" id="sys-username">-</td>
+                      </tr>
+                      <tr>
+                        <td class="text-muted">สิทธิ์</td>
+                        <td class="fw-semibold" id="sys-role">-</td>
+                      </tr>
+                      <tr>
+                        <td class="text-muted">เข้าใช้งาน</td>
+                        <td class="fw-semibold" id="sys-login-time">-</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /content-area -->
+      </div>
+      <!-- /main-content -->
+    </div>
+    <!-- /app-screen -->
+
+    <!-- Global Search Overlay -->
+    <div
+      class="search-overlay"
+      id="search-overlay"
+      onclick="closeSearch()"
+    ></div>
+    <div class="search-modal" id="search-modal">
+      <div class="search-input-wrap">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          id="search-input"
+          placeholder="ค้นหาลูกค้า สินค้า ใบสั่งซื้อ..."
+          oninput="doSearch()"
+          autocomplete="off"
+        />
+        <kbd>ESC</kbd>
+      </div>
+      <div id="search-results" class="search-results">
+        <div class="search-empty">พิมพ์เพื่อค้นหา...</div>
+      </div>
+    </div>
+
+    <!-- Print Area (hidden) -->
+    <div id="print-area" style="display: none"></div>
+
+    <!-- ═══════════════════ MODALS ═══════════════════ -->
+
+    <!-- Material Modal -->
+    <div class="modal fade" id="materialModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="materialModalTitle">เพิ่มวัตถุดิบ</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="material-form">
+              <input type="hidden" id="mat-id" />
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >รหัส <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="mat-code"
+                    required
+                  />
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label"
+                    >ชื่อวัตถุดิบ <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="mat-name"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >หน่วย <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="mat-unit"
+                    required
+                    placeholder="เช่น ใบ, กก., ชุด"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">จำนวนเริ่มต้น</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="mat-qty"
+                    min="0"
+                    value="0"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">จำนวนขั้นต่ำ</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="mat-min"
+                    min="0"
+                    value="0"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">ราคาต่อหน่วย (บาท)</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="mat-cost"
+                    min="0"
+                    step="0.01"
+                    value="0"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-primary" onclick="saveMaterial()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adjust Modal -->
+    <div class="modal fade" id="adjustModal" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header" id="adjust-header">
+            <h5 class="modal-title">ปรับสต็อกวัตถุดิบ</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="adj-id" />
+            <p class="fw-semibold" id="adj-name"></p>
+            <p class="text-muted small" id="adj-current"></p>
+            <div class="mb-3">
+              <label class="form-label">ประเภท</label>
+              <select class="form-select" id="adj-type">
+                <option value="in">รับเข้า (+)</option>
+                <option value="out">เบิกออก (-)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"
+                >จำนวน <span class="text-danger">*</span></label
+              ><input
+                type="number"
+                class="form-control"
+                id="adj-qty"
+                min="0.01"
+                step="0.01"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">หมายเหตุ</label
+              ><input
+                type="text"
+                class="form-control"
+                id="adj-note"
+                placeholder="ระบุเหตุผล"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-primary" onclick="saveAdjust()">
+              บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Material Logs Modal -->
+    <div class="modal fade" id="logsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="logs-title">ประวัติการเคลื่อนไหว</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body p-0">
+            <div class="table-responsive">
+              <table class="table table-sm mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>วันที่</th>
+                    <th>ประเภท</th>
+                    <th class="text-end">จำนวน</th>
+                    <th>หมายเหตุ</th>
+                    <th>โดย</th>
+                  </tr>
+                </thead>
+                <tbody id="logs-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ปิด
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="productModalTitle">เพิ่มสินค้า</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="product-form">
+              <input type="hidden" id="prod-id" />
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >รหัสสินค้า <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="prod-code"
+                    required
+                  />
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label"
+                    >ชื่อสินค้า <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="prod-name"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">ขนาด (ml)</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="prod-size"
+                    min="0"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">หน่วย</label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="prod-unit"
+                    value="ขวด"
+                    placeholder="ขวด/ถัง"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">สต็อกเริ่มต้น</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="prod-stock"
+                    min="0"
+                    value="0"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">ราคาขาย (บาท)</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="prod-price"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">ต้นทุน (บาท)</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="prod-cost"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">สต็อกขั้นต่ำ</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="prod-min"
+                    min="0"
+                    value="0"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-primary" onclick="saveProduct()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Production Modal -->
+    <div class="modal fade" id="productionModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">สร้างใบสั่งผลิต</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label"
+                >สินค้า <span class="text-danger">*</span></label
+              ><select class="form-select" id="prd-product" required>
+                <option value="">-- เลือกสินค้า --</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"
+                >จำนวนที่สั่งผลิต <span class="text-danger">*</span></label
+              ><input
+                type="number"
+                class="form-control"
+                id="prd-qty"
+                min="1"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">หมายเหตุ</label
+              ><textarea
+                class="form-control"
+                id="prd-notes"
+                rows="2"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-success" onclick="saveProduction()">
+              <i class="bi bi-save me-1"></i>สร้างใบสั่งผลิต
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Production Status Modal -->
+    <div class="modal fade" id="productionStatusModal" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">อัปเดตสถานะการผลิต</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="ps-id" />
+            <p class="fw-semibold" id="ps-name"></p>
+            <div class="mb-3">
+              <label class="form-label">สถานะ</label>
+              <select class="form-select" id="ps-status">
+                <option value="in_progress">กำลังผลิต</option>
+                <option value="completed">เสร็จแล้ว</option>
+                <option value="cancelled">ยกเลิก</option>
+              </select>
+            </div>
+            <div class="mb-3" id="ps-qty-group">
+              <label class="form-label">จำนวนที่ผลิตได้จริง</label
+              ><input type="number" class="form-control" id="ps-qty" min="0" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-primary" onclick="saveProductionStatus()">
+              บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Modal -->
+    <div class="modal fade" id="customerModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-info text-white">
+            <h5 class="modal-title" id="customerModalTitle">เพิ่มลูกค้า</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="customer-form">
+              <input type="hidden" id="cust-id" />
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >รหัส <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="cust-code"
+                    required
+                  />
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label"
+                    >ชื่อลูกค้า <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="cust-name"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">โทรศัพท์</label
+                  ><input type="tel" class="form-control" id="cust-phone" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">ประเภท</label>
+                  <select class="form-select" id="cust-type">
+                    <option value="retail">ขายปลีก</option>
+                    <option value="wholesale">ขายส่ง</option>
+                    <option value="corporate">บริษัท</option>
+                    <option value="distributor">ตัวแทนจำหน่าย</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">ที่อยู่</label
+                  ><textarea
+                    class="form-control"
+                    id="cust-address"
+                    rows="2"
+                  ></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">วงเงินเครดิต (บาท)</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="cust-credit"
+                    min="0"
+                    value="0"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-info text-white" onclick="saveCustomer()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sale Modal (Create Order) -->
+    <div class="modal fade" id="saleModal" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">สร้างใบสั่งซื้อ</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label"
+                  >ลูกค้า <span class="text-danger">*</span></label
+                ><select class="form-select" id="sale-customer" required>
+                  <option value="">-- เลือกลูกค้า --</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label"
+                  >วันที่ <span class="text-danger">*</span></label
+                ><input
+                  type="date"
+                  class="form-control"
+                  id="sale-date"
+                  required
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">กำหนดชำระ</label
+                ><input type="date" class="form-control" id="sale-due" />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">ส่วนลด (บาท)</label
+                ><input
+                  type="number"
+                  class="form-control"
+                  id="sale-discount"
+                  min="0"
+                  value="0"
+                  oninput="calcSaleTotal()"
+                />
+              </div>
+              <div class="col-12">
+                <label class="form-label">หมายเหตุ</label
+                ><input type="text" class="form-control" id="sale-notes" />
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <strong>รายการสินค้า</strong>
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+                onclick="addSaleItem()"
+              >
+                <i class="bi bi-plus-circle me-1"></i>เพิ่มสินค้า
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 35%">สินค้า</th>
+                    <th style="width: 15%">จำนวน</th>
+                    <th style="width: 18%">ราคา/หน่วย</th>
+                    <th style="width: 18%">ยอดรวม</th>
+                    <th style="width: 7%"></th>
+                  </tr>
+                </thead>
+                <tbody id="sale-items-tbody">
+                  <tr id="sale-empty-row">
+                    <td colspan="5" class="text-center text-muted py-3">
+                      กดเพิ่มสินค้า
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="text-end">
+              <table class="ms-auto" style="min-width: 240px">
+                <tr>
+                  <td class="pe-3 text-muted">ยอดก่อนส่วนลด:</td>
+                  <td class="text-end fw-semibold" id="sale-subtotal">฿0</td>
+                </tr>
+                <tr>
+                  <td class="pe-3 text-muted">ส่วนลด:</td>
+                  <td class="text-end text-danger" id="sale-discount-display">
+                    ฿0
+                  </td>
+                </tr>
+                <tr class="fs-5 fw-bold">
+                  <td class="pe-3 border-top">ยอดรวมสุทธิ:</td>
+                  <td class="text-end border-top text-primary" id="sale-total">
+                    ฿0
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-primary" onclick="saveSale()">
+              <i class="bi bi-save me-1"></i>สร้างใบสั่งซื้อ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sale Detail Modal -->
+    <div class="modal fade" id="saleDetailModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="detail-order-num"></h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body" id="sale-detail-body">กำลังโหลด...</div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ปิด
+            </button>
+            <button class="btn btn-outline-secondary" onclick="printInvoice()">
+              <i class="bi bi-printer me-1"></i>พิมพ์ใบกำกับ
+            </button>
+            <button
+              class="btn btn-success"
+              id="btn-add-payment"
+              onclick="showPaymentFromDetail()"
+            >
+              <i class="bi bi-cash-coin me-1"></i>บันทึกชำระเงิน
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">บันทึกชำระเงิน</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="pay-order-id" />
+            <p class="fw-semibold small" id="pay-info"></p>
+            <div class="mb-3">
+              <label class="form-label"
+                >จำนวนเงิน <span class="text-danger">*</span></label
+              ><input
+                type="number"
+                class="form-control form-control-lg"
+                id="pay-amount"
+                min="0.01"
+                step="0.01"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">วันที่ชำระ</label
+              ><input type="date" class="form-control" id="pay-date" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">วิธีชำระ</label>
+              <select class="form-select" id="pay-method">
+                <option value="cash">เงินสด</option>
+                <option value="transfer">โอนเงิน</option>
+                <option value="check">เช็ค</option>
+                <option value="credit">เครดิต</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">เลขอ้างอิง</label
+              ><input
+                type="text"
+                class="form-control"
+                id="pay-ref"
+                placeholder="เช่น เลขที่โอน, เลขเช็ค"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">หมายเหตุ</label
+              ><input type="text" class="form-control" id="pay-notes" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-success" onclick="savePayment()">
+              <i class="bi bi-cash-coin me-1"></i>บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Modal -->
+    <div class="modal fade" id="deliveryModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-warning">
+            <h5 class="modal-title">สร้างใบส่งของ</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label"
+                >ใบสั่งซื้อ <span class="text-danger">*</span></label
+              ><select class="form-select" id="del-order" required>
+                <option value="">-- เลือกใบสั่งซื้อ --</option>
+              </select>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">ชื่อคนขับ</label
+                ><input type="text" class="form-control" id="del-driver" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">ทะเบียนรถ</label
+                ><input type="text" class="form-control" id="del-vehicle" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">วันที่จัดส่ง</label
+                ><input type="date" class="form-control" id="del-date" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">หมายเหตุ</label
+                ><textarea
+                  class="form-control"
+                  id="del-notes"
+                  rows="2"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-warning" onclick="saveDelivery()">
+              <i class="bi bi-truck me-1"></i>สร้างใบส่งของ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Update Modal -->
+    <div class="modal fade" id="deliveryUpdateModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">อัปเดตการจัดส่ง</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="dup-id" />
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">ชื่อคนขับ</label
+                ><input type="text" class="form-control" id="dup-driver" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">ทะเบียนรถ</label
+                ><input type="text" class="form-control" id="dup-vehicle" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">วันที่จัดส่ง</label
+                ><input type="date" class="form-control" id="dup-date" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">สถานะ</label>
+                <select class="form-select" id="dup-status">
+                  <option value="pending">รอจัดส่ง</option>
+                  <option value="in_transit">กำลังส่ง</option>
+                  <option value="delivered">ส่งแล้ว</option>
+                  <option value="failed">ไม่สำเร็จ</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">หมายเหตุ</label
+                ><textarea
+                  class="form-control"
+                  id="dup-notes"
+                  rows="2"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-primary" onclick="saveDeliveryUpdate()">
+              บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title" id="userModalTitle">เพิ่มผู้ใช้งาน</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="user-form">
+              <input type="hidden" id="usr-id" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >ชื่อผู้ใช้ <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="usr-username"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >รหัสผ่าน
+                    <span class="text-danger" id="usr-pass-required"
+                      >*</span
+                    ></label
+                  ><input
+                    type="password"
+                    class="form-control"
+                    id="usr-password"
+                    autocomplete="new-password"
+                    placeholder="ปล่อยว่างเพื่อคงรหัสเดิม"
+                  />
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label"
+                    >ชื่อ-นามสกุล <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="usr-name"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">บทบาท</label>
+                  <select class="form-select" id="usr-role">
+                    <option value="staff">พนักงาน</option>
+                    <option value="manager">ผู้จัดการ</option>
+                    <option value="admin">ผู้ดูแลระบบ</option>
+                  </select>
+                </div>
+                <div
+                  class="col-md-4"
+                  id="usr-active-group"
+                  style="display: none"
+                >
+                  <label class="form-label">สถานะ</label>
+                  <select class="form-select" id="usr-active">
+                    <option value="1">ใช้งาน</option>
+                    <option value="0">ระงับ</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-dark" onclick="saveUser()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ TOAST ═══════════════════ -->
+    <div
+      class="toast-container position-fixed bottom-0 end-0 p-3"
+      style="z-index: 9999"
+    >
+      <div id="toast" class="toast align-items-center border-0" role="alert">
+        <div class="d-flex">
+          <div class="toast-body fw-semibold" id="toast-msg"></div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="/js/main.js"></script>
+  </body>
+</html>
