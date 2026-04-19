@@ -730,7 +730,7 @@ const products = {
     // Format size label
     const sizeLabel = (ml) => {
       if (!ml) return "-";
-      if (ml >= 1000) return (ml / 1000) + "L";
+      if (ml >= 1000) return ml / 1000 + "L";
       return ml + "ml";
     };
 
