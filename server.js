@@ -142,9 +142,194 @@ CREATE TABLE IF NOT EXISTS payments (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (order_id) REFERENCES sales_orders(id)
 );
+
+CREATE TABLE IF NOT EXISTS water_quality_tests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  batch_number TEXT,
+  production_order_id INTEGER,
+  ph REAL,
+  tds REAL,
+  turbidity REAL,
+  chlorine REAL,
+  bacteria_count REAL,
+  color_value REAL,
+  odor TEXT DEFAULT 'ปกติ',
+  taste TEXT DEFAULT 'ปกติ',
+  result TEXT DEFAULT 'pending',
+  tester TEXT,
+  test_date DATE NOT NULL,
+  notes TEXT,
+  created_by INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (production_order_id) REFERENCES production_orders(id)
+);
+
+CREATE TABLE IF NOT EXISTS product_bom (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  product_id INTEGER NOT NULL,
+  material_id INTEGER NOT NULL,
+  quantity_per_unit REAL NOT NULL,
+  FOREIGN KEY (product_id) REFERENCES products(id),
+  FOREIGN KEY (material_id) REFERENCES raw_materials(id)
+);
+
+CREATE TABLE IF NOT EXISTS expenses (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  category TEXT NOT NULL,
+  description TEXT,
+  amount REAL NOT NULL,
+  expense_date DATE NOT NULL,
+  receipt_ref TEXT,
+  vendor TEXT,
+  created_by INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS suppliers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  code TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  contact_person TEXT,
+  phone TEXT,
+  email TEXT,
+  address TEXT,
+  notes TEXT,
+  active INTEGER DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS purchase_orders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  po_number TEXT UNIQUE NOT NULL,
+  supplier_id INTEGER NOT NULL,
+  order_date DATE NOT NULL,
+  expected_date DATE,
+  status TEXT DEFAULT 'draft',
+  total_amount REAL DEFAULT 0,
+  notes TEXT,
+  created_by INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
+);
+
+CREATE TABLE IF NOT EXISTS purchase_items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  po_id INTEGER NOT NULL,
+  material_id INTEGER NOT NULL,
+  quantity REAL NOT NULL,
+  unit_price REAL NOT NULL,
+  subtotal REAL NOT NULL,
+  FOREIGN KEY (po_id) REFERENCES purchase_orders(id),
+  FOREIGN KEY (material_id) REFERENCES raw_materials(id)
+);
+
+CREATE TABLE IF NOT EXISTS equipment (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  code TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  type TEXT,
+  model TEXT,
+  location TEXT,
+  purchase_date DATE,
+  status TEXT DEFAULT 'active',
+  last_maintenance DATE,
+  next_maintenance DATE,
+  notes TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS maintenance_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  equipment_id INTEGER NOT NULL,
+  maintenance_type TEXT NOT NULL,
+  description TEXT,
+  cost REAL DEFAULT 0,
+  performed_by TEXT,
+  performed_date DATE NOT NULL,
+  next_due DATE,
+  notes TEXT,
+  created_by INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (equipment_id) REFERENCES equipment(id)
+);
+
+CREATE TABLE IF NOT EXISTS container_deposits (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  customer_id INTEGER NOT NULL,
+  container_type TEXT DEFAULT 'ถัง 19L',
+  quantity_out INTEGER DEFAULT 0,
+  quantity_returned INTEGER DEFAULT 0,
+  deposit_amount REAL DEFAULT 0,
+  transaction_date DATE NOT NULL,
+  notes TEXT,
+  created_by INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+CREATE TABLE IF NOT EXISTS returns (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id INTEGER,
+  product_id INTEGER,
+  batch_number TEXT,
+  quantity INTEGER NOT NULL,
+  reason TEXT NOT NULL,
+  return_date DATE NOT NULL,
+  status TEXT DEFAULT 'pending',
+  action_taken TEXT,
+  notes TEXT,
+  created_by INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES sales_orders(id),
+  FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+CREATE TABLE IF NOT EXISTS delivery_routes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  route_name TEXT NOT NULL,
+  driver_name TEXT,
+  vehicle_number TEXT,
+  delivery_date DATE NOT NULL,
+  status TEXT DEFAULT 'planned',
+  total_orders INTEGER DEFAULT 0,
+  notes TEXT,
+  created_by INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS delivery_route_orders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  route_id INTEGER NOT NULL,
+  order_id INTEGER NOT NULL,
+  sequence_number INTEGER DEFAULT 0,
+  status TEXT DEFAULT 'pending',
+  FOREIGN KEY (route_id) REFERENCES delivery_routes(id),
+  FOREIGN KEY (order_id) REFERENCES sales_orders(id)
+);
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  user_name TEXT,
+  action TEXT NOT NULL,
+  entity TEXT NOT NULL,
+  entity_id INTEGER,
+  details TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS app_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 `);
 
 // ─── Seed Data ────────────────────────────────────────────────────────────────
+// Add new columns to existing tables
+try { db.exec("ALTER TABLE production_orders ADD COLUMN batch_number TEXT"); } catch {}
+try { db.exec("ALTER TABLE production_orders ADD COLUMN expiry_date DATE"); } catch {}
+
 const adminExists = db
   .prepare("SELECT id FROM users WHERE username = ?")
   .get("admin");
@@ -244,6 +429,45 @@ if (!adminExists) {
     "distributor",
     200000,
   );
+
+  // Seed BOM (Bill of Materials)
+  const insertBom = db.prepare("INSERT INTO product_bom (product_id, material_id, quantity_per_unit) VALUES (?,?,?)");
+  insertBom.run(1, 1, 1);   // P001 (350ml) → ขวด PET 350ml x1
+  insertBom.run(1, 6, 1);   // P001 → ฝาขวด x1
+  insertBom.run(1, 7, 1);   // P001 → ฉลาก 350ml x1
+  insertBom.run(2, 2, 1);   // P002 (600ml) → ขวด PET 600ml x1
+  insertBom.run(2, 6, 1);   // P002 → ฝาขวด x1
+  insertBom.run(2, 8, 1);   // P002 → ฉลาก 600ml x1
+  insertBom.run(3, 3, 1);   // P003 (1.5L) → ขวด PET 1.5L x1
+  insertBom.run(3, 6, 1);   // P003 → ฝาขวด x1
+  insertBom.run(3, 9, 1);   // P003 → ฉลาก 1.5L x1
+  insertBom.run(4, 4, 1);   // P004 (5L) → ขวด PET 5L x1
+  insertBom.run(4, 6, 1);   // P004 → ฝาขวด x1
+  insertBom.run(5, 5, 1);   // P005 (19L) → ถัง PP 19L x1
+  insertBom.run(5, 12, 1);  // P005 → ซีลฝาถัง x1
+
+  // Seed Suppliers
+  const insertSup = db.prepare("INSERT INTO suppliers (code,name,contact_person,phone,email,address) VALUES (?,?,?,?,?,?)");
+  insertSup.run("SUP001", "บริษัท ขวดพลาสติก จำกัด", "นายสมศักดิ์", "0811111111", "bottle@supplier.com", "กรุงเทพฯ");
+  insertSup.run("SUP002", "บริษัท ฝาจีบ จำกัด", "นายวิชัย", "0822222222", "cap@supplier.com", "สมุทรปราการ");
+  insertSup.run("SUP003", "บริษัท ฉลากพิมพ์ จำกัด", "นางสมจิต", "0833333333", "label@supplier.com", "นนทบุรี");
+  insertSup.run("SUP004", "บริษัท สารกรอง จำกัด", "นายประเสริฐ", "0844444444", "filter@supplier.com", "ปทุมธานี");
+
+  // Seed Equipment
+  const insertEq = db.prepare("INSERT INTO equipment (code,name,type,model,location,status) VALUES (?,?,?,?,?,?)");
+  insertEq.run("EQ001", "เครื่องกรอง RO หลัก", "กรอง", "RO-5000", "โซนกรองน้ำ", "active");
+  insertEq.run("EQ002", "เครื่อง UV ฆ่าเชื้อ", "ฆ่าเชื้อ", "UV-3000", "โซนฆ่าเชื้อ", "active");
+  insertEq.run("EQ003", "เครื่องบรรจุ 350-600ml", "บรรจุ", "FL-AUTO-1", "สายผลิต 1", "active");
+  insertEq.run("EQ004", "เครื่องบรรจุ 1.5-5L", "บรรจุ", "FL-AUTO-2", "สายผลิต 2", "active");
+  insertEq.run("EQ005", "เครื่องบรรจุถัง 19L", "บรรจุ", "JUG-FILL-1", "สายผลิต 3", "active");
+  insertEq.run("EQ006", "เครื่องปิดฝาอัตโนมัติ", "ปิดฝา", "CAP-AUTO-1", "สายผลิต 1", "active");
+  insertEq.run("EQ007", "เครื่องติดฉลาก", "ติดฉลาก", "LBL-AUTO-1", "สายผลิต 1", "active");
+  insertEq.run("EQ008", "ปั๊มน้ำหลัก", "ปั๊ม", "PUMP-500", "โซนน้ำดิบ", "active");
+}
+
+// Audit log helper
+function logAudit(userId, userName, action, entity, entityId, details) {
+  db.prepare("INSERT INTO audit_logs (user_id,user_name,action,entity,entity_id,details) VALUES (?,?,?,?,?,?)").run(userId, userName, action, entity, entityId, details);
 }
 
 // ─── Auth Middleware ──────────────────────────────────────────────────────────
@@ -527,12 +751,17 @@ app.post("/api/production", auth(), (req, res) => {
   const { product_id, quantity_planned, notes } = req.body;
   if (!product_id || !quantity_planned)
     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบ" });
+  const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
+  const cnt = db.prepare("SELECT COUNT(*) as c FROM production_orders WHERE DATE(created_at)=DATE('now')").get().c;
+  const batch_number = `B${today}-${String(cnt+1).padStart(3,'0')}`;
+  const expiry_date = new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0];
   const r = db
     .prepare(
-      "INSERT INTO production_orders (product_id,quantity_planned,notes,created_by) VALUES (?,?,?,?)",
+      "INSERT INTO production_orders (product_id,quantity_planned,notes,created_by,batch_number,expiry_date) VALUES (?,?,?,?,?,?)",
     )
-    .run(product_id, quantity_planned, notes, req.user.id);
-  res.json({ id: r.lastInsertRowid, message: "สร้างใบสั่งผลิตสำเร็จ" });
+    .run(product_id, quantity_planned, notes, req.user.id, batch_number, expiry_date);
+  logAudit(req.user.id, req.user.name, 'create', 'production', r.lastInsertRowid, `Batch: ${batch_number}`);
+  res.json({ id: r.lastInsertRowid, batch_number, message: "สร้างใบสั่งผลิตสำเร็จ" });
 });
 
 app.put("/api/production/:id", auth(["admin", "manager"]), (req, res) => {
@@ -556,6 +785,13 @@ app.put("/api/production/:id", auth(["admin", "manager"]), (req, res) => {
         produced,
         order.product_id,
       );
+      // BOM: auto-deduct raw materials
+      const bom = db.prepare("SELECT * FROM product_bom WHERE product_id=?").all(order.product_id);
+      bom.forEach(b => {
+        const deductQty = b.quantity_per_unit * produced;
+        db.prepare("UPDATE raw_materials SET quantity=MAX(0,quantity-?),updated_at=CURRENT_TIMESTAMP WHERE id=?").run(deductQty, b.material_id);
+        db.prepare("INSERT INTO material_logs (material_id,type,quantity,note,created_by) VALUES (?,?,?,?,?)").run(b.material_id, 'out', deductQty, `ผลิต Batch: ${order.batch_number || 'N/A'} x${produced}`, req.user.id);
+      });
     }
     q += " WHERE id=?";
     params.push(req.params.id);
@@ -673,17 +909,33 @@ app.post("/api/sales", auth(), (req, res) => {
   if (!customer_id || !order_date || !items?.length)
     return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
 
+  // Check credit limit
+  const customer = db.prepare("SELECT * FROM customers WHERE id=?").get(customer_id);
+  if (customer && customer.credit_limit > 0) {
+    const outstanding = db.prepare("SELECT COALESCE(SUM(total_amount-paid_amount),0) as v FROM sales_orders WHERE customer_id=? AND status NOT IN ('paid','cancelled')").get(customer_id).v;
+    const subtotals_check = items.map(i => i.quantity * i.unit_price);
+    const newTotal = subtotals_check.reduce((a,b)=>a+b, 0) - (discount || 0);
+    if (outstanding + newTotal > customer.credit_limit) {
+      return res.status(400).json({ error: `เกินวงเงินเครดิต (วงเงิน ${customer.credit_limit.toLocaleString()} / ค้างชำระ ${outstanding.toLocaleString()})` });
+    }
+  }
+
   // Validate quantities
   for (const item of items) {
     if (!item.quantity || item.quantity <= 0)
       return res.status(400).json({ error: "จำนวนสินค้าต้องมากกว่า 0" });
     if (!item.unit_price || item.unit_price < 0)
       return res.status(400).json({ error: "ราคาสินค้าไม่ถูกต้อง" });
-    const prod = db.prepare("SELECT stock, name FROM products WHERE id=?").get(item.product_id);
-    if (!prod)
-      return res.status(400).json({ error: "ไม่พบสินค้า" });
+    const prod = db
+      .prepare("SELECT stock, name FROM products WHERE id=?")
+      .get(item.product_id);
+    if (!prod) return res.status(400).json({ error: "ไม่พบสินค้า" });
     if (prod.stock < item.quantity)
-      return res.status(400).json({ error: `สินค้า "${prod.name}" สต็อกไม่พอ (คงเหลือ ${prod.stock})` });
+      return res
+        .status(400)
+        .json({
+          error: `สินค้า "${prod.name}" สต็อกไม่พอ (คงเหลือ ${prod.stock})`,
+        });
   }
 
   const cnt = db.prepare("SELECT COUNT(*) as c FROM sales_orders").get().c;
@@ -773,11 +1025,15 @@ app.post("/api/payments", auth(), (req, res) => {
 
   // Check overpayment
   const currentPaid = db
-    .prepare("SELECT COALESCE(SUM(amount),0) as v FROM payments WHERE order_id=?")
+    .prepare(
+      "SELECT COALESCE(SUM(amount),0) as v FROM payments WHERE order_id=?",
+    )
     .get(order_id).v;
   const remaining = order.total_amount - currentPaid;
   if (amount > remaining)
-    return res.status(400).json({ error: `ยอดชำระเกิน (ค้างชำระ ${remaining.toFixed(2)} บาท)` });
+    return res
+      .status(400)
+      .json({ error: `ยอดชำระเกิน (ค้างชำระ ${remaining.toFixed(2)} บาท)` });
 
   const pay = db.transaction(() => {
     db.prepare(
@@ -1009,7 +1265,9 @@ app.post("/api/users", auth(["admin"]), (req, res) => {
   if (!username || !password || !name)
     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบ" });
   if (password.length < 6)
-    return res.status(400).json({ error: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร" });
+    return res
+      .status(400)
+      .json({ error: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร" });
   try {
     const r = db
       .prepare(
@@ -1040,9 +1298,12 @@ app.put("/api/users/:id", auth(["admin"]), (req, res) => {
 });
 
 app.delete("/api/users/:id", auth(["admin"]), (req, res) => {
-  const u = db.prepare("SELECT username FROM users WHERE id=?").get(req.params.id);
+  const u = db
+    .prepare("SELECT username FROM users WHERE id=?")
+    .get(req.params.id);
   if (!u) return res.status(404).json({ error: "ไม่พบผู้ใช้" });
-  if (u.username === "admin") return res.status(400).json({ error: "ไม่สามารถลบ admin ได้" });
+  if (u.username === "admin")
+    return res.status(400).json({ error: "ไม่สามารถลบ admin ได้" });
   db.prepare("DELETE FROM users WHERE id=?").run(req.params.id);
   res.json({ message: "ลบผู้ใช้สำเร็จ" });
 });
@@ -1107,6 +1368,12 @@ app.get("/api/notifications", auth(), (req, res) => {
       msg: `ใบสั่งผลิตรอดำเนินการ ${pendProd.cnt} รายการ`,
       category: "production",
     });
+  // Maintenance alerts
+  const dueMaint = db.prepare("SELECT e.name FROM equipment e WHERE e.next_maintenance IS NOT NULL AND e.next_maintenance <= date('now','+7 days') AND e.status='active'").all();
+  dueMaint.forEach(m => alerts.push({ type: 'warning', icon: 'wrench-adjustable', msg: `เครื่อง "${m.name}" ถึงกำหนดซ่อมบำรุง`, category: 'maintenance' }));
+  // Container deposit alerts
+  const outDeposits = db.prepare("SELECT c.name, COALESCE(SUM(cd.quantity_out),0)-COALESCE(SUM(cd.quantity_returned),0) as outstanding FROM container_deposits cd JOIN customers c ON cd.customer_id=c.id GROUP BY cd.customer_id HAVING outstanding>5 ORDER BY outstanding DESC LIMIT 5").all();
+  outDeposits.forEach(d => alerts.push({ type: 'info', icon: 'archive', msg: `${d.name} ค้างถัง ${d.outstanding} ใบ`, category: 'deposit' }));
   res.json({ count: alerts.length, alerts });
 });
 
@@ -1205,6 +1472,399 @@ app.put("/api/users/me/password", auth(), (req, res) => {
     req.user.id,
   );
   res.json({ message: "เปลี่ยนรหัสผ่านสำเร็จ" });
+});
+
+// ─── Water Quality / QC ───────────────────────────────────────────────────────
+app.get("/api/qc", auth(), (req, res) => {
+  const rows = db.prepare(`
+    SELECT qt.*, po.batch_number, p.name as product_name, u.name as created_by_name
+    FROM water_quality_tests qt
+    LEFT JOIN production_orders po ON qt.production_order_id=po.id
+    LEFT JOIN products p ON po.product_id=p.id
+    LEFT JOIN users u ON qt.created_by=u.id
+    ORDER BY qt.created_at DESC
+  `).all();
+  res.json(rows);
+});
+
+app.post("/api/qc", auth(), (req, res) => {
+  const { batch_number, production_order_id, ph, tds, turbidity, chlorine, bacteria_count, color_value, odor, taste, result, tester, test_date, notes } = req.body;
+  if (!test_date) return res.status(400).json({ error: "กรุณาระบุวันที่ทดสอบ" });
+  const r = db.prepare("INSERT INTO water_quality_tests (batch_number,production_order_id,ph,tds,turbidity,chlorine,bacteria_count,color_value,odor,taste,result,tester,test_date,notes,created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").run(batch_number, production_order_id||null, ph||null, tds||null, turbidity||null, chlorine||null, bacteria_count||null, color_value||null, odor||'ปกติ', taste||'ปกติ', result||'pending', tester, test_date, notes, req.user.id);
+  logAudit(req.user.id, req.user.name, 'create', 'qc', r.lastInsertRowid, `QC test batch ${batch_number}`);
+  res.json({ id: r.lastInsertRowid, message: "บันทึกผลตรวจสำเร็จ" });
+});
+
+app.put("/api/qc/:id", auth(["admin","manager"]), (req, res) => {
+  const { ph, tds, turbidity, chlorine, bacteria_count, color_value, odor, taste, result, tester, notes } = req.body;
+  db.prepare("UPDATE water_quality_tests SET ph=?,tds=?,turbidity=?,chlorine=?,bacteria_count=?,color_value=?,odor=?,taste=?,result=?,tester=?,notes=? WHERE id=?").run(ph, tds, turbidity, chlorine, bacteria_count, color_value, odor, taste, result, tester, notes, req.params.id);
+  res.json({ message: "แก้ไขผลตรวจสำเร็จ" });
+});
+
+app.delete("/api/qc/:id", auth(["admin"]), (req, res) => {
+  db.prepare("DELETE FROM water_quality_tests WHERE id=?").run(req.params.id);
+  res.json({ message: "ลบผลตรวจสำเร็จ" });
+});
+
+// ─── BOM (Bill of Materials) ──────────────────────────────────────────────────
+app.get("/api/bom/:productId", auth(), (req, res) => {
+  const rows = db.prepare(`
+    SELECT pb.*, rm.name as material_name, rm.unit, rm.cost_per_unit, rm.quantity as stock
+    FROM product_bom pb JOIN raw_materials rm ON pb.material_id=rm.id
+    WHERE pb.product_id=?
+  `).all(req.params.productId);
+  res.json(rows);
+});
+
+app.post("/api/bom", auth(["admin","manager"]), (req, res) => {
+  const { product_id, material_id, quantity_per_unit } = req.body;
+  if (!product_id || !material_id || !quantity_per_unit) return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
+  const existing = db.prepare("SELECT id FROM product_bom WHERE product_id=? AND material_id=?").get(product_id, material_id);
+  if (existing) return res.status(400).json({ error: "มีวัตถุดิบนี้ใน BOM แล้ว" });
+  const r = db.prepare("INSERT INTO product_bom (product_id,material_id,quantity_per_unit) VALUES (?,?,?)").run(product_id, material_id, quantity_per_unit);
+  res.json({ id: r.lastInsertRowid, message: "เพิ่มสูตรผลิตสำเร็จ" });
+});
+
+app.delete("/api/bom/:id", auth(["admin","manager"]), (req, res) => {
+  db.prepare("DELETE FROM product_bom WHERE id=?").run(req.params.id);
+  res.json({ message: "ลบรายการ BOM สำเร็จ" });
+});
+
+// ─── Expenses ─────────────────────────────────────────────────────────────────
+app.get("/api/expenses", auth(), (req, res) => {
+  const { from, to, category } = req.query;
+  let q = "SELECT e.*, u.name as created_by_name FROM expenses e LEFT JOIN users u ON e.created_by=u.id WHERE 1=1";
+  const p = [];
+  if (from) { q += " AND e.expense_date>=?"; p.push(from); }
+  if (to) { q += " AND e.expense_date<=?"; p.push(to); }
+  if (category) { q += " AND e.category=?"; p.push(category); }
+  q += " ORDER BY e.expense_date DESC, e.created_at DESC";
+  res.json(db.prepare(q).all(...p));
+});
+
+app.post("/api/expenses", auth(["admin","manager"]), (req, res) => {
+  const { category, description, amount, expense_date, receipt_ref, vendor } = req.body;
+  if (!category || !amount || !expense_date) return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบ" });
+  if (amount <= 0) return res.status(400).json({ error: "จำนวนเงินต้องมากกว่า 0" });
+  const r = db.prepare("INSERT INTO expenses (category,description,amount,expense_date,receipt_ref,vendor,created_by) VALUES (?,?,?,?,?,?,?)").run(category, description, amount, expense_date, receipt_ref, vendor, req.user.id);
+  logAudit(req.user.id, req.user.name, 'create', 'expense', r.lastInsertRowid, `${category}: ${amount} บาท`);
+  res.json({ id: r.lastInsertRowid, message: "บันทึกค่าใช้จ่ายสำเร็จ" });
+});
+
+app.put("/api/expenses/:id", auth(["admin","manager"]), (req, res) => {
+  const { category, description, amount, expense_date, receipt_ref, vendor } = req.body;
+  db.prepare("UPDATE expenses SET category=?,description=?,amount=?,expense_date=?,receipt_ref=?,vendor=? WHERE id=?").run(category, description, amount, expense_date, receipt_ref, vendor, req.params.id);
+  res.json({ message: "แก้ไขค่าใช้จ่ายสำเร็จ" });
+});
+
+app.delete("/api/expenses/:id", auth(["admin"]), (req, res) => {
+  db.prepare("DELETE FROM expenses WHERE id=?").run(req.params.id);
+  res.json({ message: "ลบค่าใช้จ่ายสำเร็จ" });
+});
+
+app.get("/api/expenses/summary", auth(), (req, res) => {
+  const from = req.query.from || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+  const to = req.query.to || new Date().toISOString().split('T')[0];
+  const byCategory = db.prepare("SELECT category, SUM(amount) as total, COUNT(*) as count FROM expenses WHERE expense_date BETWEEN ? AND ? GROUP BY category ORDER BY total DESC").all(from, to);
+  const total = db.prepare("SELECT COALESCE(SUM(amount),0) as v FROM expenses WHERE expense_date BETWEEN ? AND ?").get(from, to).v;
+  const byMonth = db.prepare("SELECT strftime('%Y-%m', expense_date) as month, SUM(amount) as total FROM expenses WHERE expense_date BETWEEN ? AND ? GROUP BY month ORDER BY month").all(from, to);
+  res.json({ byCategory, total, byMonth, from, to });
+});
+
+// ─── Suppliers ────────────────────────────────────────────────────────────────
+app.get("/api/suppliers", auth(), (req, res) => {
+  res.json(db.prepare("SELECT * FROM suppliers WHERE active=1 ORDER BY code").all());
+});
+
+app.post("/api/suppliers", auth(["admin","manager"]), (req, res) => {
+  const { code, name, contact_person, phone, email, address, notes } = req.body;
+  if (!code || !name) return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบ" });
+  try {
+    const r = db.prepare("INSERT INTO suppliers (code,name,contact_person,phone,email,address,notes) VALUES (?,?,?,?,?,?,?)").run(code, name, contact_person, phone, email, address, notes);
+    res.json({ id: r.lastInsertRowid, message: "เพิ่มซัพพลายเออร์สำเร็จ" });
+  } catch { res.status(400).json({ error: "รหัสซัพพลายเออร์ซ้ำ" }); }
+});
+
+app.put("/api/suppliers/:id", auth(["admin","manager"]), (req, res) => {
+  const { name, contact_person, phone, email, address, notes } = req.body;
+  db.prepare("UPDATE suppliers SET name=?,contact_person=?,phone=?,email=?,address=?,notes=? WHERE id=?").run(name, contact_person, phone, email, address, notes, req.params.id);
+  res.json({ message: "แก้ไขซัพพลายเออร์สำเร็จ" });
+});
+
+app.delete("/api/suppliers/:id", auth(["admin"]), (req, res) => {
+  db.prepare("UPDATE suppliers SET active=0 WHERE id=?").run(req.params.id);
+  res.json({ message: "ลบซัพพลายเออร์สำเร็จ" });
+});
+
+// ─── Purchase Orders ──────────────────────────────────────────────────────────
+app.get("/api/purchase-orders", auth(), (req, res) => {
+  const rows = db.prepare(`
+    SELECT po.*, s.name as supplier_name, u.name as created_by_name
+    FROM purchase_orders po
+    JOIN suppliers s ON po.supplier_id=s.id
+    LEFT JOIN users u ON po.created_by=u.id
+    ORDER BY po.created_at DESC
+  `).all();
+  res.json(rows);
+});
+
+app.get("/api/purchase-orders/:id", auth(), (req, res) => {
+  const po = db.prepare("SELECT po.*, s.name as supplier_name FROM purchase_orders po JOIN suppliers s ON po.supplier_id=s.id WHERE po.id=?").get(req.params.id);
+  if (!po) return res.status(404).json({ error: "ไม่พบใบสั่งซื้อ" });
+  const items = db.prepare("SELECT pi.*, rm.name as material_name, rm.unit FROM purchase_items pi JOIN raw_materials rm ON pi.material_id=rm.id WHERE pi.po_id=?").all(req.params.id);
+  res.json({ ...po, items });
+});
+
+app.post("/api/purchase-orders", auth(["admin","manager"]), (req, res) => {
+  const { supplier_id, order_date, expected_date, items, notes } = req.body;
+  if (!supplier_id || !order_date || !items?.length) return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
+  const cnt = db.prepare("SELECT COUNT(*) as c FROM purchase_orders").get().c;
+  const po_number = "PO" + String(cnt+1).padStart(5,"0");
+  const subtotals = items.map(i => i.quantity * i.unit_price);
+  const total = subtotals.reduce((a,b)=>a+b, 0);
+  const create = db.transaction(() => {
+    const r = db.prepare("INSERT INTO purchase_orders (po_number,supplier_id,order_date,expected_date,total_amount,notes,created_by) VALUES (?,?,?,?,?,?,?)").run(po_number, supplier_id, order_date, expected_date, total, notes, req.user.id);
+    const stmt = db.prepare("INSERT INTO purchase_items (po_id,material_id,quantity,unit_price,subtotal) VALUES (?,?,?,?,?)");
+    items.forEach((item,i) => stmt.run(r.lastInsertRowid, item.material_id, item.quantity, item.unit_price, subtotals[i]));
+    return r.lastInsertRowid;
+  });
+  const id = create();
+  logAudit(req.user.id, req.user.name, 'create', 'purchase_order', id, `PO: ${po_number}`);
+  res.json({ id, po_number, message: "สร้างใบสั่งซื้อสำเร็จ" });
+});
+
+app.put("/api/purchase-orders/:id/status", auth(["admin","manager"]), (req, res) => {
+  const { status } = req.body;
+  const po = db.prepare("SELECT * FROM purchase_orders WHERE id=?").get(req.params.id);
+  if (!po) return res.status(404).json({ error: "ไม่พบใบสั่งซื้อ" });
+  const update = db.transaction(() => {
+    db.prepare("UPDATE purchase_orders SET status=? WHERE id=?").run(status, req.params.id);
+    if (status === 'received') {
+      const items = db.prepare("SELECT * FROM purchase_items WHERE po_id=?").all(req.params.id);
+      items.forEach(item => {
+        db.prepare("UPDATE raw_materials SET quantity=quantity+?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(item.quantity, item.material_id);
+        db.prepare("INSERT INTO material_logs (material_id,type,quantity,note,created_by) VALUES (?,?,?,?,?)").run(item.material_id, 'in', item.quantity, `รับจาก PO: ${po.po_number}`, req.user.id);
+      });
+    }
+  });
+  update();
+  res.json({ message: "อัปเดตสถานะสำเร็จ" });
+});
+
+// ─── Equipment & Maintenance ──────────────────────────────────────────────────
+app.get("/api/equipment", auth(), (req, res) => {
+  const rows = db.prepare("SELECT * FROM equipment ORDER BY code").all();
+  rows.forEach(eq => {
+    eq.maintenance_count = db.prepare("SELECT COUNT(*) as c FROM maintenance_logs WHERE equipment_id=?").get(eq.id).c;
+    eq.last_log = db.prepare("SELECT * FROM maintenance_logs WHERE equipment_id=? ORDER BY performed_date DESC LIMIT 1").get(eq.id);
+  });
+  res.json(rows);
+});
+
+app.post("/api/equipment", auth(["admin","manager"]), (req, res) => {
+  const { code, name, type, model, location, purchase_date, notes } = req.body;
+  if (!code || !name) return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบ" });
+  try {
+    const r = db.prepare("INSERT INTO equipment (code,name,type,model,location,purchase_date,notes) VALUES (?,?,?,?,?,?,?)").run(code, name, type, model, location, purchase_date, notes);
+    res.json({ id: r.lastInsertRowid, message: "เพิ่มอุปกรณ์สำเร็จ" });
+  } catch { res.status(400).json({ error: "รหัสอุปกรณ์ซ้ำ" }); }
+});
+
+app.put("/api/equipment/:id", auth(["admin","manager"]), (req, res) => {
+  const { name, type, model, location, status, notes } = req.body;
+  db.prepare("UPDATE equipment SET name=?,type=?,model=?,location=?,status=?,notes=? WHERE id=?").run(name, type, model, location, status, notes, req.params.id);
+  res.json({ message: "แก้ไขอุปกรณ์สำเร็จ" });
+});
+
+app.delete("/api/equipment/:id", auth(["admin"]), (req, res) => {
+  db.prepare("DELETE FROM equipment WHERE id=?").run(req.params.id);
+  db.prepare("DELETE FROM maintenance_logs WHERE equipment_id=?").run(req.params.id);
+  res.json({ message: "ลบอุปกรณ์สำเร็จ" });
+});
+
+app.get("/api/equipment/:id/maintenance", auth(), (req, res) => {
+  const logs = db.prepare("SELECT ml.*, u.name as created_by_name FROM maintenance_logs ml LEFT JOIN users u ON ml.created_by=u.id WHERE ml.equipment_id=? ORDER BY ml.performed_date DESC").all(req.params.id);
+  res.json(logs);
+});
+
+app.post("/api/maintenance", auth(), (req, res) => {
+  const { equipment_id, maintenance_type, description, cost, performed_by, performed_date, next_due, notes } = req.body;
+  if (!equipment_id || !maintenance_type || !performed_date) return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
+  const r = db.prepare("INSERT INTO maintenance_logs (equipment_id,maintenance_type,description,cost,performed_by,performed_date,next_due,notes,created_by) VALUES (?,?,?,?,?,?,?,?,?)").run(equipment_id, maintenance_type, description, cost||0, performed_by, performed_date, next_due, notes, req.user.id);
+  db.prepare("UPDATE equipment SET last_maintenance=?,next_maintenance=? WHERE id=?").run(performed_date, next_due, equipment_id);
+  logAudit(req.user.id, req.user.name, 'create', 'maintenance', r.lastInsertRowid, `ซ่อมบำรุง: ${maintenance_type}`);
+  res.json({ id: r.lastInsertRowid, message: "บันทึกการซ่อมบำรุงสำเร็จ" });
+});
+
+// ─── Container Deposits (ถังมัดจำ) ────────────────────────────────────────────
+app.get("/api/deposits", auth(), (req, res) => {
+  const rows = db.prepare(`
+    SELECT cd.*, c.name as customer_name, c.phone as customer_phone, u.name as created_by_name
+    FROM container_deposits cd
+    JOIN customers c ON cd.customer_id=c.id
+    LEFT JOIN users u ON cd.created_by=u.id
+    ORDER BY cd.created_at DESC
+  `).all();
+  res.json(rows);
+});
+
+app.get("/api/deposits/summary", auth(), (req, res) => {
+  const byCustomer = db.prepare(`
+    SELECT c.id, c.name, c.phone,
+      COALESCE(SUM(cd.quantity_out),0) as total_out,
+      COALESCE(SUM(cd.quantity_returned),0) as total_returned,
+      COALESCE(SUM(cd.quantity_out),0) - COALESCE(SUM(cd.quantity_returned),0) as outstanding,
+      COALESCE(SUM(cd.deposit_amount),0) as total_deposit
+    FROM container_deposits cd JOIN customers c ON cd.customer_id=c.id
+    GROUP BY cd.customer_id ORDER BY outstanding DESC
+  `).all();
+  const totalOut = byCustomer.reduce((s,r)=>s+r.total_out,0);
+  const totalReturned = byCustomer.reduce((s,r)=>s+r.total_returned,0);
+  res.json({ byCustomer, totalOut, totalReturned, outstanding: totalOut-totalReturned });
+});
+
+app.post("/api/deposits", auth(), (req, res) => {
+  const { customer_id, container_type, quantity_out, quantity_returned, deposit_amount, transaction_date, notes } = req.body;
+  if (!customer_id || !transaction_date) return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
+  const r = db.prepare("INSERT INTO container_deposits (customer_id,container_type,quantity_out,quantity_returned,deposit_amount,transaction_date,notes,created_by) VALUES (?,?,?,?,?,?,?,?)").run(customer_id, container_type||'ถัง 19L', quantity_out||0, quantity_returned||0, deposit_amount||0, transaction_date, notes, req.user.id);
+  res.json({ id: r.lastInsertRowid, message: "บันทึกถังมัดจำสำเร็จ" });
+});
+
+// ─── Returns (คืนสินค้า/ของเสีย) ──────────────────────────────────────────────
+app.get("/api/returns", auth(), (req, res) => {
+  const rows = db.prepare(`
+    SELECT r.*, p.name as product_name, so.order_number, u.name as created_by_name
+    FROM returns r
+    LEFT JOIN products p ON r.product_id=p.id
+    LEFT JOIN sales_orders so ON r.order_id=so.id
+    LEFT JOIN users u ON r.created_by=u.id
+    ORDER BY r.created_at DESC
+  `).all();
+  res.json(rows);
+});
+
+app.post("/api/returns", auth(), (req, res) => {
+  const { order_id, product_id, batch_number, quantity, reason, return_date, notes } = req.body;
+  if (!product_id || !quantity || !reason || !return_date) return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
+  const r = db.prepare("INSERT INTO returns (order_id,product_id,batch_number,quantity,reason,return_date,notes,created_by) VALUES (?,?,?,?,?,?,?,?)").run(order_id||null, product_id, batch_number, quantity, reason, return_date, notes, req.user.id);
+  logAudit(req.user.id, req.user.name, 'create', 'return', r.lastInsertRowid, `คืนสินค้า: ${quantity} ชิ้น`);
+  res.json({ id: r.lastInsertRowid, message: "บันทึกการคืนสินค้าสำเร็จ" });
+});
+
+app.put("/api/returns/:id", auth(["admin","manager"]), (req, res) => {
+  const { status, action_taken } = req.body;
+  db.prepare("UPDATE returns SET status=?,action_taken=? WHERE id=?").run(status, action_taken, req.params.id);
+  if (status === 'approved') {
+    const ret = db.prepare("SELECT * FROM returns WHERE id=?").get(req.params.id);
+    if (ret) db.prepare("UPDATE products SET stock=stock+? WHERE id=?").run(ret.quantity, ret.product_id);
+  }
+  res.json({ message: "อัปเดตสำเร็จ" });
+});
+
+// ─── Delivery Routes ──────────────────────────────────────────────────────────
+app.get("/api/delivery-routes", auth(), (req, res) => {
+  const rows = db.prepare(`
+    SELECT dr.*, u.name as created_by_name,
+      (SELECT COUNT(*) FROM delivery_route_orders WHERE route_id=dr.id) as order_count
+    FROM delivery_routes dr
+    LEFT JOIN users u ON dr.created_by=u.id
+    ORDER BY dr.delivery_date DESC
+  `).all();
+  res.json(rows);
+});
+
+app.get("/api/delivery-routes/:id", auth(), (req, res) => {
+  const route = db.prepare("SELECT * FROM delivery_routes WHERE id=?").get(req.params.id);
+  if (!route) return res.status(404).json({ error: "ไม่พบเส้นทาง" });
+  const orders = db.prepare(`
+    SELECT dro.*, so.order_number, so.total_amount, so.status as order_status,
+      c.name as customer_name, c.address, c.phone
+    FROM delivery_route_orders dro
+    JOIN sales_orders so ON dro.order_id=so.id
+    JOIN customers c ON so.customer_id=c.id
+    WHERE dro.route_id=? ORDER BY dro.sequence_number
+  `).all(req.params.id);
+  res.json({ ...route, orders });
+});
+
+app.post("/api/delivery-routes", auth(), (req, res) => {
+  const { route_name, driver_name, vehicle_number, delivery_date, order_ids, notes } = req.body;
+  if (!route_name || !delivery_date) return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
+  const create = db.transaction(() => {
+    const r = db.prepare("INSERT INTO delivery_routes (route_name,driver_name,vehicle_number,delivery_date,total_orders,notes,created_by) VALUES (?,?,?,?,?,?,?)").run(route_name, driver_name, vehicle_number, delivery_date, (order_ids||[]).length, notes, req.user.id);
+    if (order_ids?.length) {
+      const stmt = db.prepare("INSERT INTO delivery_route_orders (route_id,order_id,sequence_number) VALUES (?,?,?)");
+      order_ids.forEach((oid, i) => stmt.run(r.lastInsertRowid, oid, i+1));
+    }
+    return r.lastInsertRowid;
+  });
+  const id = create();
+  res.json({ id, message: "สร้างเส้นทางจัดส่งสำเร็จ" });
+});
+
+app.put("/api/delivery-routes/:id/status", auth(), (req, res) => {
+  const { status } = req.body;
+  db.prepare("UPDATE delivery_routes SET status=? WHERE id=?").run(status, req.params.id);
+  res.json({ message: "อัปเดตสถานะสำเร็จ" });
+});
+
+// ─── Audit Logs ───────────────────────────────────────────────────────────────
+app.get("/api/audit-logs", auth(["admin"]), (req, res) => {
+  const rows = db.prepare("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 200").all();
+  res.json(rows);
+});
+
+// ─── App Settings (DB-backed) ─────────────────────────────────────────────────
+app.get("/api/settings", auth(), (req, res) => {
+  const rows = db.prepare("SELECT * FROM app_settings").all();
+  const settings = {};
+  rows.forEach(r => settings[r.key] = r.value);
+  res.json(settings);
+});
+
+app.put("/api/settings", auth(["admin"]), (req, res) => {
+  const entries = Object.entries(req.body);
+  const upsert = db.prepare("INSERT INTO app_settings (key,value,updated_at) VALUES (?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP");
+  entries.forEach(([k,v]) => upsert.run(k, v));
+  res.json({ message: "บันทึกการตั้งค่าสำเร็จ" });
+});
+
+// ─── Enhanced Reports ─────────────────────────────────────────────────────────
+app.get("/api/reports/expenses", auth(), (req, res) => {
+  const from = req.query.from || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+  const to = req.query.to || new Date().toISOString().split('T')[0];
+  const byCategory = db.prepare("SELECT category, SUM(amount) as total, COUNT(*) as count FROM expenses WHERE expense_date BETWEEN ? AND ? GROUP BY category ORDER BY total DESC").all(from, to);
+  const total = db.prepare("SELECT COALESCE(SUM(amount),0) as v FROM expenses WHERE expense_date BETWEEN ? AND ?").get(from, to).v;
+  res.json({ byCategory, total, from, to });
+});
+
+app.get("/api/reports/credit", auth(), (req, res) => {
+  const customers = db.prepare(`
+    SELECT c.code, c.name, c.phone, c.credit_limit, c.balance,
+      COALESCE(SUM(CASE WHEN so.status NOT IN ('paid','cancelled') THEN so.total_amount-so.paid_amount ELSE 0 END),0) as outstanding
+    FROM customers c LEFT JOIN sales_orders so ON c.id=so.customer_id
+    WHERE c.active=1 GROUP BY c.id ORDER BY outstanding DESC
+  `).all();
+  const aging = db.prepare(`
+    SELECT c.name,
+      SUM(CASE WHEN julianday('now')-julianday(so.due_date) BETWEEN 0 AND 30 THEN so.total_amount-so.paid_amount ELSE 0 END) as d30,
+      SUM(CASE WHEN julianday('now')-julianday(so.due_date) BETWEEN 31 AND 60 THEN so.total_amount-so.paid_amount ELSE 0 END) as d60,
+      SUM(CASE WHEN julianday('now')-julianday(so.due_date) BETWEEN 61 AND 90 THEN so.total_amount-so.paid_amount ELSE 0 END) as d90,
+      SUM(CASE WHEN julianday('now')-julianday(so.due_date) > 90 THEN so.total_amount-so.paid_amount ELSE 0 END) as d90plus
+    FROM sales_orders so JOIN customers c ON so.customer_id=c.id
+    WHERE so.status NOT IN ('paid','cancelled') AND so.due_date IS NOT NULL
+    GROUP BY c.id ORDER BY d90plus DESC
+  `).all();
+  res.json({ customers, aging });
+});
+
+app.get("/api/reports/qc", auth(), (req, res) => {
+  const from = req.query.from || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+  const to = req.query.to || new Date().toISOString().split('T')[0];
+  const tests = db.prepare("SELECT * FROM water_quality_tests WHERE test_date BETWEEN ? AND ? ORDER BY test_date DESC").all(from, to);
+  const summary = db.prepare("SELECT result, COUNT(*) as count FROM water_quality_tests WHERE test_date BETWEEN ? AND ? GROUP BY result").all(from, to);
+  const avgValues = db.prepare("SELECT AVG(ph) as avg_ph, AVG(tds) as avg_tds, AVG(turbidity) as avg_turbidity FROM water_quality_tests WHERE test_date BETWEEN ? AND ?").get(from, to);
+  res.json({ tests, summary, avgValues, from, to });
 });
 
 // ─── Start ────────────────────────────────────────────────────────────────────
