@@ -73,6 +73,14 @@ const fmt = {
       .split("T")[0],
 };
 
+// ─── XSS Escape ──────────────────────────────────────────
+function esc(s) {
+  if (s == null) return '';
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
 // ─── Status Labels ───────────────────────────────────────
 function statusBadge(status) {
   const map = {
@@ -2336,211 +2344,269 @@ window.changePassword = async () => {
 // ─── QC คุณภาพน้ำ ──────────────────────────────────────────────────────
 async function loadQC() {
   try {
-    const data = await api.get('/api/qc');
-    const pass = data.filter(r => r.result === 'pass').length;
-    const fail = data.filter(r => r.result === 'fail').length;
-    const pending = data.filter(r => r.result === 'pending').length;
-    const phs = data.filter(r => r.ph).map(r => r.ph);
-    const avgPh = phs.length ? (phs.reduce((a,b) => a+b, 0) / phs.length).toFixed(2) : '-';
-    document.getElementById('qc-pass').textContent = pass;
-    document.getElementById('qc-fail').textContent = fail;
-    document.getElementById('qc-pending').textContent = pending;
-    document.getElementById('qc-avg-ph').textContent = avgPh;
-    const tbody = document.getElementById('qc-table');
-    tbody.innerHTML = data.map(r => `<tr>
+    const data = await api.get("/api/qc");
+    const pass = data.filter((r) => r.result === "pass").length;
+    const fail = data.filter((r) => r.result === "fail").length;
+    const pending = data.filter((r) => r.result === "pending").length;
+    const phs = data.filter((r) => r.ph).map((r) => r.ph);
+    const avgPh = phs.length
+      ? (phs.reduce((a, b) => a + b, 0) / phs.length).toFixed(2)
+      : "-";
+    document.getElementById("qc-pass").textContent = pass;
+    document.getElementById("qc-fail").textContent = fail;
+    document.getElementById("qc-pending").textContent = pending;
+    document.getElementById("qc-avg-ph").textContent = avgPh;
+    const tbody = document.getElementById("qc-table");
+    tbody.innerHTML = data
+      .map(
+        (r) => `<tr>
       <td>${fmt.date(r.test_date)}</td>
-      <td><code>${r.batch_number || '-'}</code></td>
-      <td>${r.product_name || '-'}</td>
-      <td>${r.ph ?? '-'}</td><td>${r.tds ?? '-'}</td><td>${r.turbidity ?? '-'}</td><td>${r.chlorine ?? '-'}</td>
-      <td>${r.bacteria_count ?? '-'}</td>
-      <td><span class="badge ${r.result === 'pass' ? 'bg-success' : r.result === 'fail' ? 'bg-danger' : 'bg-warning'}">${r.result === 'pass' ? 'ผ่าน' : r.result === 'fail' ? 'ไม่ผ่าน' : 'รอผล'}</span></td>
-      <td>${r.tester || '-'}</td>
+      <td><code>${r.batch_number || "-"}</code></td>
+      <td>${r.product_name || "-"}</td>
+      <td>${r.ph ?? "-"}</td><td>${r.tds ?? "-"}</td><td>${r.turbidity ?? "-"}</td><td>${r.chlorine ?? "-"}</td>
+      <td>${r.bacteria_count ?? "-"}</td>
+      <td><span class="badge ${r.result === "pass" ? "bg-success" : r.result === "fail" ? "bg-danger" : "bg-warning"}">${r.result === "pass" ? "ผ่าน" : r.result === "fail" ? "ไม่ผ่าน" : "รอผล"}</span></td>
+      <td>${r.tester || "-"}</td>
       <td><button class="btn btn-outline-primary btn-sm" onclick="showQcModal(${r.id})"><i class="bi bi-pencil"></i></button>
           <button class="btn btn-outline-danger btn-sm" onclick="deleteQc(${r.id})"><i class="bi bi-trash"></i></button></td>
-    </tr>`).join('');
-  } catch (err) { toast(err.message, 'danger'); }
+    </tr>`,
+      )
+      .join("");
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 }
 
 window.showQcModal = async (id) => {
-  document.getElementById('qc-form').reset();
-  document.getElementById('qc-id').value = '';
-  document.getElementById('qc-date').value = fmt.today();
+  document.getElementById("qc-form").reset();
+  document.getElementById("qc-id").value = "";
+  document.getElementById("qc-date").value = fmt.today();
   // Load batch options
   try {
-    const prods = await api.get('/api/production');
-    const sel = document.getElementById('qc-batch');
-    sel.innerHTML = '<option value="">-- เลือก --</option>' + prods.filter(p => p.batch_number).map(p => `<option value="${p.id}" data-batch="${p.batch_number}">${p.batch_number} - ${p.product_name}</option>`).join('');
+    const prods = await api.get("/api/production");
+    const sel = document.getElementById("qc-batch");
+    sel.innerHTML =
+      '<option value="">-- เลือก --</option>' +
+      prods
+        .filter((p) => p.batch_number)
+        .map(
+          (p) =>
+            `<option value="${p.id}" data-batch="${p.batch_number}">${p.batch_number} - ${p.product_name}</option>`,
+        )
+        .join("");
   } catch {}
   if (id) {
     try {
-      const data = await api.get('/api/qc');
-      const r = data.find(q => q.id === id);
+      const data = await api.get("/api/qc");
+      const r = data.find((q) => q.id === id);
       if (r) {
-        document.getElementById('qc-id').value = r.id;
-        document.getElementById('qc-batch').value = r.production_order_id || '';
-        document.getElementById('qc-date').value = r.test_date || '';
-        document.getElementById('qc-tester').value = r.tester || '';
-        document.getElementById('qc-ph').value = r.ph || '';
-        document.getElementById('qc-tds').value = r.tds || '';
-        document.getElementById('qc-turbidity').value = r.turbidity || '';
-        document.getElementById('qc-chlorine').value = r.chlorine || '';
-        document.getElementById('qc-bacteria').value = r.bacteria_count || '';
-        document.getElementById('qc-color').value = r.color_value || '';
-        document.getElementById('qc-odor').value = r.odor || 'ปกติ';
-        document.getElementById('qc-taste').value = r.taste || 'ปกติ';
-        document.getElementById('qc-result').value = r.result || 'pending';
-        document.getElementById('qc-notes').value = r.notes || '';
+        document.getElementById("qc-id").value = r.id;
+        document.getElementById("qc-batch").value = r.production_order_id || "";
+        document.getElementById("qc-date").value = r.test_date || "";
+        document.getElementById("qc-tester").value = r.tester || "";
+        document.getElementById("qc-ph").value = r.ph || "";
+        document.getElementById("qc-tds").value = r.tds || "";
+        document.getElementById("qc-turbidity").value = r.turbidity || "";
+        document.getElementById("qc-chlorine").value = r.chlorine || "";
+        document.getElementById("qc-bacteria").value = r.bacteria_count || "";
+        document.getElementById("qc-color").value = r.color_value || "";
+        document.getElementById("qc-odor").value = r.odor || "ปกติ";
+        document.getElementById("qc-taste").value = r.taste || "ปกติ";
+        document.getElementById("qc-result").value = r.result || "pending";
+        document.getElementById("qc-notes").value = r.notes || "";
       }
     } catch {}
   }
-  new bootstrap.Modal('#qcModal').show();
+  new bootstrap.Modal("#qcModal").show();
 };
 
 window.saveQc = async () => {
-  const id = document.getElementById('qc-id').value;
-  const selBatch = document.getElementById('qc-batch');
+  const id = document.getElementById("qc-id").value;
+  const selBatch = document.getElementById("qc-batch");
   const batchOpt = selBatch.selectedOptions[0];
   const body = {
     production_order_id: selBatch.value || null,
-    batch_number: batchOpt?.dataset?.batch || '',
-    test_date: document.getElementById('qc-date').value,
-    tester: document.getElementById('qc-tester').value,
-    ph: parseFloat(document.getElementById('qc-ph').value) || null,
-    tds: parseFloat(document.getElementById('qc-tds').value) || null,
-    turbidity: parseFloat(document.getElementById('qc-turbidity').value) || null,
-    chlorine: parseFloat(document.getElementById('qc-chlorine').value) || null,
-    bacteria_count: parseFloat(document.getElementById('qc-bacteria').value) || null,
-    color_value: parseFloat(document.getElementById('qc-color').value) || null,
-    odor: document.getElementById('qc-odor').value,
-    taste: document.getElementById('qc-taste').value,
-    result: document.getElementById('qc-result').value,
-    notes: document.getElementById('qc-notes').value,
+    batch_number: batchOpt?.dataset?.batch || "",
+    test_date: document.getElementById("qc-date").value,
+    tester: document.getElementById("qc-tester").value,
+    ph: parseFloat(document.getElementById("qc-ph").value) || null,
+    tds: parseFloat(document.getElementById("qc-tds").value) || null,
+    turbidity:
+      parseFloat(document.getElementById("qc-turbidity").value) || null,
+    chlorine: parseFloat(document.getElementById("qc-chlorine").value) || null,
+    bacteria_count:
+      parseFloat(document.getElementById("qc-bacteria").value) || null,
+    color_value: parseFloat(document.getElementById("qc-color").value) || null,
+    odor: document.getElementById("qc-odor").value,
+    taste: document.getElementById("qc-taste").value,
+    result: document.getElementById("qc-result").value,
+    notes: document.getElementById("qc-notes").value,
   };
-  if (!body.test_date) return toast('กรุณาระบุวันที่ทดสอบ', 'warning');
+  if (!body.test_date) return toast("กรุณาระบุวันที่ทดสอบ", "warning");
   try {
-    if (id) await api.put('/api/qc/' + id, body);
-    else await api.post('/api/qc', body);
-    bootstrap.Modal.getInstance(document.getElementById('qcModal')).hide();
-    toast(id ? 'แก้ไขผลตรวจสำเร็จ' : 'บันทึกผลตรวจสำเร็จ');
+    if (id) await api.put("/api/qc/" + id, body);
+    else await api.post("/api/qc", body);
+    bootstrap.Modal.getInstance(document.getElementById("qcModal")).hide();
+    toast(id ? "แก้ไขผลตรวจสำเร็จ" : "บันทึกผลตรวจสำเร็จ");
     loadQC();
-  } catch (err) { toast(err.message, 'danger'); }
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 window.deleteQc = async (id) => {
-  if (!confirm('ลบผลตรวจนี้?')) return;
-  try { await api.delete('/api/qc/' + id); toast('ลบสำเร็จ'); loadQC(); }
-  catch (err) { toast(err.message, 'danger'); }
+  if (!confirm("ลบผลตรวจนี้?")) return;
+  try {
+    await api.delete("/api/qc/" + id);
+    toast("ลบสำเร็จ");
+    loadQC();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 // ─── SUPPLIERS ──────────────────────────────────────────────────────
 async function loadSuppliers() {
   try {
-    const data = await api.get('/api/suppliers');
-    const grid = document.getElementById('suppliers-grid');
-    grid.innerHTML = data.map(s => `<div class="col-12 col-md-6 col-lg-4">
+    const data = await api.get("/api/suppliers");
+    const grid = document.getElementById("suppliers-grid");
+    grid.innerHTML = data
+      .map(
+        (s) => `<div class="col-12 col-md-6 col-lg-4">
       <div class="card h-100"><div class="card-body">
         <h6 class="card-title"><i class="bi bi-building me-1"></i>${s.name} <small class="text-muted">(${s.code})</small></h6>
-        <p class="card-text small mb-1"><i class="bi bi-person me-1"></i>${s.contact_person || '-'}</p>
-        <p class="card-text small mb-1"><i class="bi bi-telephone me-1"></i>${s.phone || '-'}</p>
-        <p class="card-text small mb-1"><i class="bi bi-envelope me-1"></i>${s.email || '-'}</p>
-        <p class="card-text small mb-0"><i class="bi bi-geo-alt me-1"></i>${s.address || '-'}</p>
-        ${s.notes ? `<p class="card-text small text-muted mt-1">${s.notes}</p>` : ''}
+        <p class="card-text small mb-1"><i class="bi bi-person me-1"></i>${s.contact_person || "-"}</p>
+        <p class="card-text small mb-1"><i class="bi bi-telephone me-1"></i>${s.phone || "-"}</p>
+        <p class="card-text small mb-1"><i class="bi bi-envelope me-1"></i>${s.email || "-"}</p>
+        <p class="card-text small mb-0"><i class="bi bi-geo-alt me-1"></i>${s.address || "-"}</p>
+        ${s.notes ? `<p class="card-text small text-muted mt-1">${s.notes}</p>` : ""}
       </div><div class="card-footer d-flex gap-1">
         <button class="btn btn-outline-primary btn-sm" onclick="showSupplierModal(${s.id})"><i class="bi bi-pencil"></i></button>
         <button class="btn btn-outline-danger btn-sm" onclick="deleteSupplier(${s.id})"><i class="bi bi-trash"></i></button>
-      </div></div></div>`).join('');
-  } catch (err) { toast(err.message, 'danger'); }
+      </div></div></div>`,
+      )
+      .join("");
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 }
 
 window.showSupplierModal = async (id) => {
-  document.getElementById('supplier-form').reset();
-  document.getElementById('sup-id').value = '';
+  document.getElementById("supplier-form").reset();
+  document.getElementById("sup-id").value = "";
   if (id) {
     try {
-      const data = await api.get('/api/suppliers');
-      const s = data.find(x => x.id === id);
+      const data = await api.get("/api/suppliers");
+      const s = data.find((x) => x.id === id);
       if (s) {
-        document.getElementById('sup-id').value = s.id;
-        document.getElementById('sup-code').value = s.code;
-        document.getElementById('sup-name').value = s.name;
-        document.getElementById('sup-contact').value = s.contact_person || '';
-        document.getElementById('sup-phone').value = s.phone || '';
-        document.getElementById('sup-email').value = s.email || '';
-        document.getElementById('sup-address').value = s.address || '';
-        document.getElementById('sup-notes').value = s.notes || '';
+        document.getElementById("sup-id").value = s.id;
+        document.getElementById("sup-code").value = s.code;
+        document.getElementById("sup-name").value = s.name;
+        document.getElementById("sup-contact").value = s.contact_person || "";
+        document.getElementById("sup-phone").value = s.phone || "";
+        document.getElementById("sup-email").value = s.email || "";
+        document.getElementById("sup-address").value = s.address || "";
+        document.getElementById("sup-notes").value = s.notes || "";
       }
     } catch {}
   }
-  new bootstrap.Modal('#supplierModal').show();
+  new bootstrap.Modal("#supplierModal").show();
 };
 
 window.saveSupplier = async () => {
-  const id = document.getElementById('sup-id').value;
+  const id = document.getElementById("sup-id").value;
   const body = {
-    code: document.getElementById('sup-code').value.trim(),
-    name: document.getElementById('sup-name').value.trim(),
-    contact_person: document.getElementById('sup-contact').value.trim(),
-    phone: document.getElementById('sup-phone').value.trim(),
-    email: document.getElementById('sup-email').value.trim(),
-    address: document.getElementById('sup-address').value.trim(),
-    notes: document.getElementById('sup-notes').value.trim(),
+    code: document.getElementById("sup-code").value.trim(),
+    name: document.getElementById("sup-name").value.trim(),
+    contact_person: document.getElementById("sup-contact").value.trim(),
+    phone: document.getElementById("sup-phone").value.trim(),
+    email: document.getElementById("sup-email").value.trim(),
+    address: document.getElementById("sup-address").value.trim(),
+    notes: document.getElementById("sup-notes").value.trim(),
   };
-  if (!body.code || !body.name) return toast('กรุณากรอกรหัสและชื่อ', 'warning');
+  if (!body.code || !body.name) return toast("กรุณากรอกรหัสและชื่อ", "warning");
   try {
-    if (id) await api.put('/api/suppliers/' + id, body);
-    else await api.post('/api/suppliers', body);
-    bootstrap.Modal.getInstance(document.getElementById('supplierModal')).hide();
-    toast(id ? 'แก้ไขซัพพลายเออร์สำเร็จ' : 'เพิ่มซัพพลายเออร์สำเร็จ');
+    if (id) await api.put("/api/suppliers/" + id, body);
+    else await api.post("/api/suppliers", body);
+    bootstrap.Modal.getInstance(
+      document.getElementById("supplierModal"),
+    ).hide();
+    toast(id ? "แก้ไขซัพพลายเออร์สำเร็จ" : "เพิ่มซัพพลายเออร์สำเร็จ");
     loadSuppliers();
-  } catch (err) { toast(err.message, 'danger'); }
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 window.deleteSupplier = async (id) => {
-  if (!confirm('ลบซัพพลายเออร์นี้?')) return;
-  try { await api.delete('/api/suppliers/' + id); toast('ลบสำเร็จ'); loadSuppliers(); }
-  catch (err) { toast(err.message, 'danger'); }
+  if (!confirm("ลบซัพพลายเออร์นี้?")) return;
+  try {
+    await api.delete("/api/suppliers/" + id);
+    toast("ลบสำเร็จ");
+    loadSuppliers();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 // ─── PURCHASE ORDERS ──────────────────────────────────────────────────────
 async function loadPurchaseOrders() {
   try {
-    const data = await api.get('/api/purchase-orders');
-    const draft = data.filter(p => p.status === 'draft').length;
-    const approved = data.filter(p => p.status === 'approved').length;
-    const received = data.filter(p => p.status === 'received').length;
+    const data = await api.get("/api/purchase-orders");
+    const draft = data.filter((p) => p.status === "draft").length;
+    const approved = data.filter((p) => p.status === "approved").length;
+    const received = data.filter((p) => p.status === "received").length;
     const total = data.reduce((s, p) => s + (p.total_amount || 0), 0);
-    document.getElementById('po-draft').textContent = draft;
-    document.getElementById('po-approved').textContent = approved;
-    document.getElementById('po-received').textContent = received;
-    document.getElementById('po-total').textContent = fmt.currency(total);
-    const tbody = document.getElementById('po-table');
-    const statusLabels = {draft:'ร่าง',approved:'อนุมัติ',ordered:'สั่งแล้ว',received:'รับแล้ว',cancelled:'ยกเลิก'};
-    const statusColors = {draft:'secondary',approved:'primary',ordered:'info',received:'success',cancelled:'danger'};
-    tbody.innerHTML = data.map(p => `<tr>
+    document.getElementById("po-draft").textContent = draft;
+    document.getElementById("po-approved").textContent = approved;
+    document.getElementById("po-received").textContent = received;
+    document.getElementById("po-total").textContent = fmt.currency(total);
+    const tbody = document.getElementById("po-table");
+    const statusLabels = {
+      draft: "ร่าง",
+      approved: "อนุมัติ",
+      ordered: "สั่งแล้ว",
+      received: "รับแล้ว",
+      cancelled: "ยกเลิก",
+    };
+    const statusColors = {
+      draft: "secondary",
+      approved: "primary",
+      ordered: "info",
+      received: "success",
+      cancelled: "danger",
+    };
+    tbody.innerHTML = data
+      .map(
+        (p) => `<tr>
       <td><code>${p.po_number}</code></td>
-      <td>${p.supplier_name || '-'}</td>
+      <td>${p.supplier_name || "-"}</td>
       <td>${fmt.date(p.order_date)}</td>
       <td>${fmt.date(p.expected_date)}</td>
       <td>${fmt.currency(p.total_amount)}</td>
-      <td><span class="badge bg-${statusColors[p.status] || 'secondary'}">${statusLabels[p.status] || p.status}</span></td>
+      <td><span class="badge bg-${statusColors[p.status] || "secondary"}">${statusLabels[p.status] || p.status}</span></td>
       <td>
-        ${p.status === 'draft' ? `<button class="btn btn-outline-success btn-sm" onclick="approvePO(${p.id})"><i class="bi bi-check-lg"></i></button>` : ''}
-        ${p.status === 'approved' ? `<button class="btn btn-outline-primary btn-sm" onclick="receivePO(${p.id})"><i class="bi bi-box-seam"></i> รับของ</button>` : ''}
+        ${p.status === "draft" ? `<button class="btn btn-outline-success btn-sm" onclick="approvePO(${p.id})"><i class="bi bi-check-lg"></i></button>` : ""}
+        ${p.status === "approved" ? `<button class="btn btn-outline-primary btn-sm" onclick="receivePO(${p.id})"><i class="bi bi-box-seam"></i> รับของ</button>` : ""}
       </td>
-    </tr>`).join('');
-  } catch (err) { toast(err.message, 'danger'); }
+    </tr>`,
+      )
+      .join("");
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 }
 
 let poItemIdx = 0;
 window.addPOItem = () => {
-  const container = document.getElementById('po-items-container');
+  const container = document.getElementById("po-items-container");
   const idx = poItemIdx++;
-  const div = document.createElement('div');
-  div.className = 'row g-2 mb-2 po-item align-items-end';
+  const div = document.createElement("div");
+  div.className = "row g-2 mb-2 po-item align-items-end";
   div.innerHTML = `
     <div class="col-5"><select class="form-select form-select-sm" id="poi-mat-${idx}">
       <option value="">-- วัตถุดิบ --</option>
-      ${allMaterials.map(m => `<option value="${m.id}">${m.name} (${m.unit})</option>`).join('')}
+      ${allMaterials.map((m) => `<option value="${m.id}">${m.name} (${m.unit})</option>`).join("")}
     </select></div>
     <div class="col-3"><input type="number" class="form-control form-control-sm" placeholder="จำนวน" id="poi-qty-${idx}" min="1" oninput="calcPOTotal()"></div>
     <div class="col-3"><input type="number" class="form-control form-control-sm" placeholder="ราคา/หน่วย" id="poi-price-${idx}" step="0.01" min="0" oninput="calcPOTotal()"></div>
@@ -2550,395 +2616,560 @@ window.addPOItem = () => {
 
 window.calcPOTotal = () => {
   let total = 0;
-  document.querySelectorAll('.po-item').forEach(row => {
+  document.querySelectorAll(".po-item").forEach((row) => {
     const qty = parseFloat(row.querySelector('[id^="poi-qty"]')?.value) || 0;
-    const price = parseFloat(row.querySelector('[id^="poi-price"]')?.value) || 0;
+    const price =
+      parseFloat(row.querySelector('[id^="poi-price"]')?.value) || 0;
     total += qty * price;
   });
-  document.getElementById('po-total-display').textContent = fmt.currency(total);
+  document.getElementById("po-total-display").textContent = fmt.currency(total);
 };
 
 window.showPOModal = async () => {
-  document.getElementById('po-form').reset();
-  document.getElementById('po-items-container').innerHTML = '';
-  document.getElementById('po-total-display').textContent = '฿0';
+  document.getElementById("po-form").reset();
+  document.getElementById("po-items-container").innerHTML = "";
+  document.getElementById("po-total-display").textContent = "฿0";
   poItemIdx = 0;
-  document.getElementById('po-date').value = fmt.today();
+  document.getElementById("po-date").value = fmt.today();
   // Load suppliers
   try {
-    const sups = await api.get('/api/suppliers');
-    document.getElementById('po-supplier').innerHTML = '<option value="">-- เลือก --</option>' + sups.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    const sups = await api.get("/api/suppliers");
+    document.getElementById("po-supplier").innerHTML =
+      '<option value="">-- เลือก --</option>' +
+      sups.map((s) => `<option value="${s.id}">${s.name}</option>`).join("");
   } catch {}
   // Load materials
-  try { allMaterials = await api.get('/api/materials'); } catch {}
+  try {
+    allMaterials = await api.get("/api/materials");
+  } catch {}
   addPOItem();
-  new bootstrap.Modal('#poModal').show();
+  new bootstrap.Modal("#poModal").show();
 };
 
 window.savePO = async () => {
   const items = [];
-  document.querySelectorAll('.po-item').forEach(row => {
+  document.querySelectorAll(".po-item").forEach((row) => {
     const matId = row.querySelector('[id^="poi-mat"]')?.value;
     const qty = parseFloat(row.querySelector('[id^="poi-qty"]')?.value) || 0;
-    const price = parseFloat(row.querySelector('[id^="poi-price"]')?.value) || 0;
-    if (matId && qty > 0) items.push({ material_id: parseInt(matId), quantity: qty, unit_price: price });
+    const price =
+      parseFloat(row.querySelector('[id^="poi-price"]')?.value) || 0;
+    if (matId && qty > 0)
+      items.push({
+        material_id: parseInt(matId),
+        quantity: qty,
+        unit_price: price,
+      });
   });
-  if (!items.length) return toast('กรุณาเพิ่มรายการวัตถุดิบ', 'warning');
+  if (!items.length) return toast("กรุณาเพิ่มรายการวัตถุดิบ", "warning");
   const body = {
-    supplier_id: parseInt(document.getElementById('po-supplier').value),
-    order_date: document.getElementById('po-date').value,
-    expected_date: document.getElementById('po-expected').value,
-    notes: document.getElementById('po-notes').value,
+    supplier_id: parseInt(document.getElementById("po-supplier").value),
+    order_date: document.getElementById("po-date").value,
+    expected_date: document.getElementById("po-expected").value,
+    notes: document.getElementById("po-notes").value,
     items,
   };
-  if (!body.supplier_id) return toast('กรุณาเลือกซัพพลายเออร์', 'warning');
+  if (!body.supplier_id) return toast("กรุณาเลือกซัพพลายเออร์", "warning");
   try {
-    await api.post('/api/purchase-orders', body);
-    bootstrap.Modal.getInstance(document.getElementById('poModal')).hide();
-    toast('สร้างใบสั่งซื้อสำเร็จ');
+    await api.post("/api/purchase-orders", body);
+    bootstrap.Modal.getInstance(document.getElementById("poModal")).hide();
+    toast("สร้างใบสั่งซื้อสำเร็จ");
     loadPurchaseOrders();
-  } catch (err) { toast(err.message, 'danger'); }
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 window.approvePO = async (id) => {
-  if (!confirm('อนุมัติใบสั่งซื้อนี้?')) return;
-  try { await api.put('/api/purchase-orders/' + id + '/status', { status: 'approved' }); toast('อนุมัติสำเร็จ'); loadPurchaseOrders(); }
-  catch (err) { toast(err.message, 'danger'); }
+  if (!confirm("อนุมัติใบสั่งซื้อนี้?")) return;
+  try {
+    await api.put("/api/purchase-orders/" + id + "/status", {
+      status: "approved",
+    });
+    toast("อนุมัติสำเร็จ");
+    loadPurchaseOrders();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 window.receivePO = async (id) => {
-  if (!confirm('ยืนยันรับวัตถุดิบเข้าสต็อก?')) return;
-  try { await api.put('/api/purchase-orders/' + id + '/status', { status: 'received' }); toast('รับวัตถุดิบสำเร็จ'); loadPurchaseOrders(); }
-  catch (err) { toast(err.message, 'danger'); }
+  if (!confirm("ยืนยันรับวัตถุดิบเข้าสต็อก?")) return;
+  try {
+    await api.put("/api/purchase-orders/" + id + "/status", {
+      status: "received",
+    });
+    toast("รับวัตถุดิบสำเร็จ");
+    loadPurchaseOrders();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 // ─── EXPENSES ──────────────────────────────────────────────────────
 async function loadExpenses() {
   try {
-    const monthEl = document.getElementById('exp-month');
+    const monthEl = document.getElementById("exp-month");
     if (!monthEl.value) monthEl.value = new Date().toISOString().slice(0, 7);
-    const data = await api.get('/api/expenses');
+    const data = await api.get("/api/expenses");
     const ym = monthEl.value;
-    const filtered = data.filter(e => e.expense_date && e.expense_date.startsWith(ym));
+    const filtered = data.filter(
+      (e) => e.expense_date && e.expense_date.startsWith(ym),
+    );
     const total = filtered.reduce((s, e) => s + (e.amount || 0), 0);
     const byCat = {};
-    filtered.forEach(e => { byCat[e.category] = (byCat[e.category] || 0) + e.amount; });
-    document.getElementById('exp-month-total').textContent = fmt.currency(total);
-    document.getElementById('exp-electric').textContent = fmt.currency(byCat.electricity || 0);
-    document.getElementById('exp-water').textContent = fmt.currency(byCat.water || 0);
-    const otherCats = Object.entries(byCat).filter(([k]) => k !== 'electricity' && k !== 'water').reduce((s, [, v]) => s + v, 0);
-    document.getElementById('exp-other').textContent = fmt.currency(otherCats);
-    const catLabels = {electricity:'ค่าไฟฟ้า',water:'ค่าน้ำประปา',labor:'ค่าแรงงาน',fuel:'ค่าเชื้อเพลิง',maintenance:'ค่าซ่อมบำรุง',packaging:'ค่าบรรจุภัณฑ์',transport:'ค่าขนส่ง',rent:'ค่าเช่า',other:'อื่นๆ'};
-    const tbody = document.getElementById('exp-table');
-    tbody.innerHTML = filtered.map(e => `<tr>
+    filtered.forEach((e) => {
+      byCat[e.category] = (byCat[e.category] || 0) + e.amount;
+    });
+    document.getElementById("exp-month-total").textContent =
+      fmt.currency(total);
+    document.getElementById("exp-electric").textContent = fmt.currency(
+      byCat.electricity || 0,
+    );
+    document.getElementById("exp-water").textContent = fmt.currency(
+      byCat.water || 0,
+    );
+    const otherCats = Object.entries(byCat)
+      .filter(([k]) => k !== "electricity" && k !== "water")
+      .reduce((s, [, v]) => s + v, 0);
+    document.getElementById("exp-other").textContent = fmt.currency(otherCats);
+    const catLabels = {
+      electricity: "ค่าไฟฟ้า",
+      water: "ค่าน้ำประปา",
+      labor: "ค่าแรงงาน",
+      fuel: "ค่าเชื้อเพลิง",
+      maintenance: "ค่าซ่อมบำรุง",
+      packaging: "ค่าบรรจุภัณฑ์",
+      transport: "ค่าขนส่ง",
+      rent: "ค่าเช่า",
+      other: "อื่นๆ",
+    };
+    const tbody = document.getElementById("exp-table");
+    tbody.innerHTML = filtered
+      .map(
+        (e) => `<tr>
       <td>${fmt.date(e.expense_date)}</td>
       <td><span class="badge bg-secondary">${catLabels[e.category] || e.category}</span></td>
-      <td>${e.description || '-'}</td>
-      <td>${e.vendor || '-'}</td>
+      <td>${e.description || "-"}</td>
+      <td>${e.vendor || "-"}</td>
       <td class="text-danger fw-bold">${fmt.currency(e.amount)}</td>
-      <td>${e.receipt_ref || '-'}</td>
+      <td>${e.receipt_ref || "-"}</td>
       <td><button class="btn btn-outline-primary btn-sm" onclick="showExpenseModal(${e.id})"><i class="bi bi-pencil"></i></button>
           <button class="btn btn-outline-danger btn-sm" onclick="deleteExpense(${e.id})"><i class="bi bi-trash"></i></button></td>
-    </tr>`).join('');
-  } catch (err) { toast(err.message, 'danger'); }
+    </tr>`,
+      )
+      .join("");
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 }
 
 window.showExpenseModal = async (id) => {
-  document.getElementById('expense-form').reset();
-  document.getElementById('exp-id').value = '';
-  document.getElementById('exp-date').value = fmt.today();
+  document.getElementById("expense-form").reset();
+  document.getElementById("exp-id").value = "";
+  document.getElementById("exp-date").value = fmt.today();
   if (id) {
     try {
-      const data = await api.get('/api/expenses');
-      const e = data.find(x => x.id === id);
+      const data = await api.get("/api/expenses");
+      const e = data.find((x) => x.id === id);
       if (e) {
-        document.getElementById('exp-id').value = e.id;
-        document.getElementById('exp-category').value = e.category;
-        document.getElementById('exp-amount').value = e.amount;
-        document.getElementById('exp-date').value = e.expense_date;
-        document.getElementById('exp-vendor').value = e.vendor || '';
-        document.getElementById('exp-desc').value = e.description || '';
-        document.getElementById('exp-ref').value = e.receipt_ref || '';
+        document.getElementById("exp-id").value = e.id;
+        document.getElementById("exp-category").value = e.category;
+        document.getElementById("exp-amount").value = e.amount;
+        document.getElementById("exp-date").value = e.expense_date;
+        document.getElementById("exp-vendor").value = e.vendor || "";
+        document.getElementById("exp-desc").value = e.description || "";
+        document.getElementById("exp-ref").value = e.receipt_ref || "";
       }
     } catch {}
   }
-  new bootstrap.Modal('#expenseModal').show();
+  new bootstrap.Modal("#expenseModal").show();
 };
 
 window.saveExpense = async () => {
-  const id = document.getElementById('exp-id').value;
+  const id = document.getElementById("exp-id").value;
   const body = {
-    category: document.getElementById('exp-category').value,
-    amount: parseFloat(document.getElementById('exp-amount').value),
-    expense_date: document.getElementById('exp-date').value,
-    vendor: document.getElementById('exp-vendor').value.trim(),
-    description: document.getElementById('exp-desc').value.trim(),
-    receipt_ref: document.getElementById('exp-ref').value.trim(),
+    category: document.getElementById("exp-category").value,
+    amount: parseFloat(document.getElementById("exp-amount").value),
+    expense_date: document.getElementById("exp-date").value,
+    vendor: document.getElementById("exp-vendor").value.trim(),
+    description: document.getElementById("exp-desc").value.trim(),
+    receipt_ref: document.getElementById("exp-ref").value.trim(),
   };
-  if (!body.amount || !body.expense_date) return toast('กรุณากรอกข้อมูลให้ครบ', 'warning');
+  if (!body.amount || !body.expense_date)
+    return toast("กรุณากรอกข้อมูลให้ครบ", "warning");
   try {
-    if (id) await api.put('/api/expenses/' + id, body);
-    else await api.post('/api/expenses', body);
-    bootstrap.Modal.getInstance(document.getElementById('expenseModal')).hide();
-    toast(id ? 'แก้ไขค่าใช้จ่ายสำเร็จ' : 'บันทึกค่าใช้จ่ายสำเร็จ');
+    if (id) await api.put("/api/expenses/" + id, body);
+    else await api.post("/api/expenses", body);
+    bootstrap.Modal.getInstance(document.getElementById("expenseModal")).hide();
+    toast(id ? "แก้ไขค่าใช้จ่ายสำเร็จ" : "บันทึกค่าใช้จ่ายสำเร็จ");
     loadExpenses();
-  } catch (err) { toast(err.message, 'danger'); }
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 window.deleteExpense = async (id) => {
-  if (!confirm('ลบรายการค่าใช้จ่ายนี้?')) return;
-  try { await api.delete('/api/expenses/' + id); toast('ลบสำเร็จ'); loadExpenses(); }
-  catch (err) { toast(err.message, 'danger'); }
+  if (!confirm("ลบรายการค่าใช้จ่ายนี้?")) return;
+  try {
+    await api.delete("/api/expenses/" + id);
+    toast("ลบสำเร็จ");
+    loadExpenses();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 // ─── MAINTENANCE ──────────────────────────────────────────────────────
 async function loadMaintenance() {
   try {
-    const eqData = await api.get('/api/equipment');
+    const eqData = await api.get("/api/equipment");
     const total = eqData.length;
-    const active = eqData.filter(e => e.status === 'active').length;
-    const maint = eqData.filter(e => e.status === 'maintenance').length;
+    const active = eqData.filter((e) => e.status === "active").length;
+    const maint = eqData.filter((e) => e.status === "maintenance").length;
     const today = fmt.today();
-    const dueIn7 = new Date(); dueIn7.setDate(dueIn7.getDate() + 7);
-    const due = eqData.filter(e => e.next_maintenance && e.next_maintenance <= dueIn7.toISOString().slice(0,10)).length;
-    document.getElementById('eq-total').textContent = total;
-    document.getElementById('eq-active').textContent = active;
-    document.getElementById('eq-maint').textContent = maint;
-    document.getElementById('eq-due').textContent = due;
-    const grid = document.getElementById('equipment-grid');
-    grid.innerHTML = eqData.map(e => {
-      const isDue = e.next_maintenance && e.next_maintenance <= dueIn7.toISOString().slice(0,10);
-      return `<div class="col-12 col-md-6 col-lg-4">
-        <div class="card h-100 ${isDue ? 'border-warning' : ''}"><div class="card-body">
+    const dueIn7 = new Date();
+    dueIn7.setDate(dueIn7.getDate() + 7);
+    const due = eqData.filter(
+      (e) =>
+        e.next_maintenance &&
+        e.next_maintenance <= dueIn7.toISOString().slice(0, 10),
+    ).length;
+    document.getElementById("eq-total").textContent = total;
+    document.getElementById("eq-active").textContent = active;
+    document.getElementById("eq-maint").textContent = maint;
+    document.getElementById("eq-due").textContent = due;
+    const grid = document.getElementById("equipment-grid");
+    grid.innerHTML = eqData
+      .map((e) => {
+        const isDue =
+          e.next_maintenance &&
+          e.next_maintenance <= dueIn7.toISOString().slice(0, 10);
+        return `<div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 ${isDue ? "border-warning" : ""}"><div class="card-body">
           <h6 class="card-title"><i class="bi bi-gear me-1"></i>${e.name} <small class="text-muted">(${e.code})</small></h6>
-          <span class="badge ${e.status === 'active' ? 'bg-success' : e.status === 'maintenance' ? 'bg-warning' : 'bg-secondary'} mb-2">${e.status === 'active' ? 'ใช้งาน' : e.status === 'maintenance' ? 'ซ่อมบำรุง' : 'ไม่ใช้งาน'}</span>
-          <p class="card-text small mb-1"><i class="bi bi-tag me-1"></i>ประเภท: ${e.type || '-'} | รุ่น: ${e.model || '-'}</p>
-          <p class="card-text small mb-1"><i class="bi bi-geo-alt me-1"></i>${e.location || '-'}</p>
-          <p class="card-text small mb-1"><i class="bi bi-wrench me-1"></i>ซ่อมล่าสุด: ${e.last_maintenance ? fmt.date(e.last_maintenance) : '-'}</p>
-          <p class="card-text small mb-0 ${isDue ? 'text-danger fw-bold' : ''}"><i class="bi bi-calendar-check me-1"></i>ซ่อมครั้งถัดไป: ${e.next_maintenance ? fmt.date(e.next_maintenance) : '-'} ${isDue ? '⚠️' : ''}</p>
+          <span class="badge ${e.status === "active" ? "bg-success" : e.status === "maintenance" ? "bg-warning" : "bg-secondary"} mb-2">${e.status === "active" ? "ใช้งาน" : e.status === "maintenance" ? "ซ่อมบำรุง" : "ไม่ใช้งาน"}</span>
+          <p class="card-text small mb-1"><i class="bi bi-tag me-1"></i>ประเภท: ${e.type || "-"} | รุ่น: ${e.model || "-"}</p>
+          <p class="card-text small mb-1"><i class="bi bi-geo-alt me-1"></i>${e.location || "-"}</p>
+          <p class="card-text small mb-1"><i class="bi bi-wrench me-1"></i>ซ่อมล่าสุด: ${e.last_maintenance ? fmt.date(e.last_maintenance) : "-"}</p>
+          <p class="card-text small mb-0 ${isDue ? "text-danger fw-bold" : ""}"><i class="bi bi-calendar-check me-1"></i>ซ่อมครั้งถัดไป: ${e.next_maintenance ? fmt.date(e.next_maintenance) : "-"} ${isDue ? "⚠️" : ""}</p>
         </div><div class="card-footer d-flex gap-1">
           <button class="btn btn-outline-primary btn-sm" onclick="showEquipmentModal(${e.id})"><i class="bi bi-pencil"></i></button>
           <button class="btn btn-outline-danger btn-sm" onclick="deleteEquipment(${e.id})"><i class="bi bi-trash"></i></button>
         </div></div></div>`;
-    }).join('');
-  } catch (err) { toast(err.message, 'danger'); }
+      })
+      .join("");
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 }
 
 window.showEquipmentModal = async (id) => {
-  document.getElementById('equipment-form').reset();
-  document.getElementById('eq-id').value = '';
+  document.getElementById("equipment-form").reset();
+  document.getElementById("eq-id").value = "";
   if (id) {
     try {
-      const data = await api.get('/api/equipment');
-      const e = data.find(x => x.id === id);
+      const data = await api.get("/api/equipment");
+      const e = data.find((x) => x.id === id);
       if (e) {
-        document.getElementById('eq-id').value = e.id;
-        document.getElementById('eq-code').value = e.code;
-        document.getElementById('eq-name').value = e.name;
-        document.getElementById('eq-type').value = e.type || '';
-        document.getElementById('eq-model').value = e.model || '';
-        document.getElementById('eq-location').value = e.location || '';
-        document.getElementById('eq-purchase-date').value = e.purchase_date || '';
-        document.getElementById('eq-status').value = e.status || 'active';
-        document.getElementById('eq-notes').value = e.notes || '';
+        document.getElementById("eq-id").value = e.id;
+        document.getElementById("eq-code").value = e.code;
+        document.getElementById("eq-name").value = e.name;
+        document.getElementById("eq-type").value = e.type || "";
+        document.getElementById("eq-model").value = e.model || "";
+        document.getElementById("eq-location").value = e.location || "";
+        document.getElementById("eq-purchase-date").value =
+          e.purchase_date || "";
+        document.getElementById("eq-status").value = e.status || "active";
+        document.getElementById("eq-notes").value = e.notes || "";
       }
     } catch {}
   }
-  new bootstrap.Modal('#equipmentModal').show();
+  new bootstrap.Modal("#equipmentModal").show();
 };
 
 window.saveEquipment = async () => {
-  const id = document.getElementById('eq-id').value;
+  const id = document.getElementById("eq-id").value;
   const body = {
-    code: document.getElementById('eq-code').value.trim(),
-    name: document.getElementById('eq-name').value.trim(),
-    type: document.getElementById('eq-type').value.trim(),
-    model: document.getElementById('eq-model').value.trim(),
-    location: document.getElementById('eq-location').value.trim(),
-    purchase_date: document.getElementById('eq-purchase-date').value,
-    status: document.getElementById('eq-status').value,
-    notes: document.getElementById('eq-notes').value.trim(),
+    code: document.getElementById("eq-code").value.trim(),
+    name: document.getElementById("eq-name").value.trim(),
+    type: document.getElementById("eq-type").value.trim(),
+    model: document.getElementById("eq-model").value.trim(),
+    location: document.getElementById("eq-location").value.trim(),
+    purchase_date: document.getElementById("eq-purchase-date").value,
+    status: document.getElementById("eq-status").value,
+    notes: document.getElementById("eq-notes").value.trim(),
   };
-  if (!body.code || !body.name) return toast('กรุณากรอกรหัสและชื่อ', 'warning');
+  if (!body.code || !body.name) return toast("กรุณากรอกรหัสและชื่อ", "warning");
   try {
-    if (id) await api.put('/api/equipment/' + id, body);
-    else await api.post('/api/equipment', body);
-    bootstrap.Modal.getInstance(document.getElementById('equipmentModal')).hide();
-    toast(id ? 'แก้ไขเครื่องจักรสำเร็จ' : 'เพิ่มเครื่องจักรสำเร็จ');
+    if (id) await api.put("/api/equipment/" + id, body);
+    else await api.post("/api/equipment", body);
+    bootstrap.Modal.getInstance(
+      document.getElementById("equipmentModal"),
+    ).hide();
+    toast(id ? "แก้ไขเครื่องจักรสำเร็จ" : "เพิ่มเครื่องจักรสำเร็จ");
     loadMaintenance();
-  } catch (err) { toast(err.message, 'danger'); }
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 window.deleteEquipment = async (id) => {
-  if (!confirm('ลบเครื่องจักรนี้?')) return;
-  try { await api.delete('/api/equipment/' + id); toast('ลบสำเร็จ'); loadMaintenance(); }
-  catch (err) { toast(err.message, 'danger'); }
+  if (!confirm("ลบเครื่องจักรนี้?")) return;
+  try {
+    await api.delete("/api/equipment/" + id);
+    toast("ลบสำเร็จ");
+    loadMaintenance();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 window.showMaintenanceModal = async () => {
-  document.getElementById('maintenance-form').reset();
-  document.getElementById('mt-date').value = fmt.today();
+  document.getElementById("maintenance-form").reset();
+  document.getElementById("mt-date").value = fmt.today();
   try {
-    const eqData = await api.get('/api/equipment');
-    document.getElementById('mt-equipment').innerHTML = '<option value="">-- เลือก --</option>' + eqData.map(e => `<option value="${e.id}">${e.name} (${e.code})</option>`).join('');
+    const eqData = await api.get("/api/equipment");
+    document.getElementById("mt-equipment").innerHTML =
+      '<option value="">-- เลือก --</option>' +
+      eqData
+        .map((e) => `<option value="${e.id}">${e.name} (${e.code})</option>`)
+        .join("");
   } catch {}
-  new bootstrap.Modal('#maintenanceModal').show();
+  new bootstrap.Modal("#maintenanceModal").show();
 };
 
 window.saveMaintenance = async () => {
   const body = {
-    equipment_id: parseInt(document.getElementById('mt-equipment').value),
-    maintenance_type: document.getElementById('mt-type').value,
-    description: document.getElementById('mt-desc').value.trim(),
-    cost: parseFloat(document.getElementById('mt-cost').value) || 0,
-    performed_by: document.getElementById('mt-performer').value.trim(),
-    performed_date: document.getElementById('mt-date').value,
-    next_due: document.getElementById('mt-next').value,
-    notes: document.getElementById('mt-notes').value.trim(),
+    equipment_id: parseInt(document.getElementById("mt-equipment").value),
+    maintenance_type: document.getElementById("mt-type").value,
+    description: document.getElementById("mt-desc").value.trim(),
+    cost: parseFloat(document.getElementById("mt-cost").value) || 0,
+    performed_by: document.getElementById("mt-performer").value.trim(),
+    performed_date: document.getElementById("mt-date").value,
+    next_due: document.getElementById("mt-next").value,
+    notes: document.getElementById("mt-notes").value.trim(),
   };
-  if (!body.equipment_id || !body.performed_date) return toast('กรุณาเลือกเครื่องจักรและระบุวันที่', 'warning');
+  if (!body.equipment_id || !body.performed_date)
+    return toast("กรุณาเลือกเครื่องจักรและระบุวันที่", "warning");
   try {
-    await api.post('/api/maintenance', body);
-    bootstrap.Modal.getInstance(document.getElementById('maintenanceModal')).hide();
-    toast('บันทึกซ่อมบำรุงสำเร็จ');
+    await api.post("/api/maintenance", body);
+    bootstrap.Modal.getInstance(
+      document.getElementById("maintenanceModal"),
+    ).hide();
+    toast("บันทึกซ่อมบำรุงสำเร็จ");
     loadMaintenance();
-  } catch (err) { toast(err.message, 'danger'); }
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 // ─── DEPOSITS ──────────────────────────────────────────────────────
 async function loadDeposits() {
   try {
-    const [data, summary] = await Promise.all([api.get('/api/deposits'), api.get('/api/deposits/summary')]);
-    const totalOut = summary.reduce((s, r) => s + (r.total_out || 0), 0);
-    const totalRet = summary.reduce((s, r) => s + (r.total_returned || 0), 0);
-    document.getElementById('dep-out').textContent = totalOut;
-    document.getElementById('dep-returned').textContent = totalRet;
-    document.getElementById('dep-outstanding').textContent = totalOut - totalRet;
+    const [data, summaryRes] = await Promise.all([
+      api.get("/api/deposits"),
+      api.get("/api/deposits/summary"),
+    ]);
+    document.getElementById("dep-out").textContent = summaryRes.totalOut || 0;
+    document.getElementById("dep-returned").textContent = summaryRes.totalReturned || 0;
+    document.getElementById("dep-outstanding").textContent = summaryRes.outstanding || 0;
     // Summary table
-    document.getElementById('dep-summary-table').innerHTML = summary.map(r => `<tr>
-      <td>${r.customer_name}</td><td>${r.phone || '-'}</td>
+    const byCustomer = summaryRes.byCustomer || [];
+    document.getElementById("dep-summary-table").innerHTML = byCustomer
+      .map(
+        (r) => `<tr>
+      <td>${esc(r.name)}</td><td>${esc(r.phone) || "-"}</td>
       <td>${r.total_out}</td><td>${r.total_returned}</td>
-      <td class="${r.outstanding > 0 ? 'text-warning fw-bold' : ''}">${r.outstanding}</td>
+      <td class="${r.outstanding > 0 ? "text-warning fw-bold" : ""}">${r.outstanding}</td>
       <td>${fmt.currency(r.total_deposit)}</td>
-    </tr>`).join('');
+    </tr>`,
+      )
+      .join("");
     // Detail table
-    document.getElementById('dep-table').innerHTML = data.map(d => `<tr>
-      <td>${fmt.date(d.transaction_date)}</td><td>${d.customer_name || '-'}</td>
-      <td>${d.container_type || '-'}</td><td>${d.quantity_out}</td><td>${d.quantity_returned}</td>
-      <td>${fmt.currency(d.deposit_amount)}</td><td>${d.notes || '-'}</td>
-    </tr>`).join('');
-  } catch (err) { toast(err.message, 'danger'); }
+    document.getElementById("dep-table").innerHTML = data
+      .map(
+        (d) => `<tr>
+      <td>${fmt.date(d.transaction_date)}</td><td>${esc(d.customer_name) || "-"}</td>
+      <td>${esc(d.container_type) || "-"}</td><td>${d.quantity_out}</td><td>${d.quantity_returned}</td>
+      <td>${fmt.currency(d.deposit_amount)}</td><td>${esc(d.notes) || "-"}</td>
+    </tr>`,
+      )
+      .join("");
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 }
 
 window.showDepositModal = async () => {
-  document.getElementById('deposit-form').reset();
-  document.getElementById('dep-date').value = fmt.today();
+  document.getElementById("deposit-form").reset();
+  document.getElementById("dep-date").value = fmt.today();
   try {
-    const custs = await api.get('/api/customers');
-    document.getElementById('dep-customer').innerHTML = '<option value="">-- เลือกลูกค้า --</option>' + custs.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    const custs = await api.get("/api/customers");
+    document.getElementById("dep-customer").innerHTML =
+      '<option value="">-- เลือกลูกค้า --</option>' +
+      custs.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
   } catch {}
-  new bootstrap.Modal('#depositModal').show();
+  new bootstrap.Modal("#depositModal").show();
 };
 
 window.saveDeposit = async () => {
   const body = {
-    customer_id: parseInt(document.getElementById('dep-customer').value),
-    transaction_date: document.getElementById('dep-date').value,
-    container_type: document.getElementById('dep-type').value,
-    deposit_amount: parseFloat(document.getElementById('dep-amount').value) || 0,
-    quantity_out: parseInt(document.getElementById('dep-qty-out').value) || 0,
-    quantity_returned: parseInt(document.getElementById('dep-qty-return').value) || 0,
-    notes: document.getElementById('dep-notes').value.trim(),
+    customer_id: parseInt(document.getElementById("dep-customer").value),
+    transaction_date: document.getElementById("dep-date").value,
+    container_type: document.getElementById("dep-type").value,
+    deposit_amount:
+      parseFloat(document.getElementById("dep-amount").value) || 0,
+    quantity_out: parseInt(document.getElementById("dep-qty-out").value) || 0,
+    quantity_returned:
+      parseInt(document.getElementById("dep-qty-return").value) || 0,
+    notes: document.getElementById("dep-notes").value.trim(),
   };
-  if (!body.customer_id || !body.transaction_date) return toast('กรุณาเลือกลูกค้าและระบุวันที่', 'warning');
+  if (!body.customer_id || !body.transaction_date)
+    return toast("กรุณาเลือกลูกค้าและระบุวันที่", "warning");
   try {
-    await api.post('/api/deposits', body);
-    bootstrap.Modal.getInstance(document.getElementById('depositModal')).hide();
-    toast('บันทึกถังมัดจำสำเร็จ');
+    await api.post("/api/deposits", body);
+    bootstrap.Modal.getInstance(document.getElementById("depositModal")).hide();
+    toast("บันทึกถังมัดจำสำเร็จ");
     loadDeposits();
-  } catch (err) { toast(err.message, 'danger'); }
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 // ─── RETURNS ──────────────────────────────────────────────────────
 async function loadReturns() {
   try {
-    const data = await api.get('/api/returns');
-    const reasonLabels = {damaged:'ชำรุด',expired:'หมดอายุ',quality:'คุณภาพไม่ผ่าน',wrong_order:'สั่งผิด',excess:'เกิน',other:'อื่นๆ'};
-    const statusLabels = {pending:'รออนุมัติ',approved:'อนุมัติ',rejected:'ปฏิเสธ'};
-    const statusColors = {pending:'warning',approved:'success',rejected:'danger'};
-    document.getElementById('returns-table').innerHTML = data.map(r => `<tr>
+    const data = await api.get("/api/returns");
+    const reasonLabels = {
+      damaged: "ชำรุด",
+      expired: "หมดอายุ",
+      quality: "คุณภาพไม่ผ่าน",
+      wrong_order: "สั่งผิด",
+      excess: "เกิน",
+      other: "อื่นๆ",
+    };
+    const statusLabels = {
+      pending: "รออนุมัติ",
+      approved: "อนุมัติ",
+      rejected: "ปฏิเสธ",
+    };
+    const statusColors = {
+      pending: "warning",
+      approved: "success",
+      rejected: "danger",
+    };
+    document.getElementById("returns-table").innerHTML = data
+      .map(
+        (r) => `<tr>
       <td>${fmt.date(r.return_date)}</td>
-      <td>${r.order_id ? '#' + r.order_id : '-'}</td>
-      <td>${r.product_name || '-'}</td>
-      <td><code>${r.batch_number || '-'}</code></td>
+      <td>${r.order_id ? "#" + r.order_id : "-"}</td>
+      <td>${r.product_name || "-"}</td>
+      <td><code>${r.batch_number || "-"}</code></td>
       <td>${r.quantity}</td>
       <td>${reasonLabels[r.reason] || r.reason}</td>
-      <td><span class="badge bg-${statusColors[r.status] || 'secondary'}">${statusLabels[r.status] || r.status}</span></td>
-      <td>${r.status === 'pending' ? `<button class="btn btn-outline-success btn-sm" onclick="approveReturn(${r.id})"><i class="bi bi-check-lg"></i></button> <button class="btn btn-outline-danger btn-sm" onclick="rejectReturn(${r.id})"><i class="bi bi-x-lg"></i></button>` : ''}</td>
-    </tr>`).join('');
-  } catch (err) { toast(err.message, 'danger'); }
+      <td><span class="badge bg-${statusColors[r.status] || "secondary"}">${statusLabels[r.status] || r.status}</span></td>
+      <td>${r.status === "pending" ? `<button class="btn btn-outline-success btn-sm" onclick="approveReturn(${r.id})"><i class="bi bi-check-lg"></i></button> <button class="btn btn-outline-danger btn-sm" onclick="rejectReturn(${r.id})"><i class="bi bi-x-lg"></i></button>` : ""}</td>
+    </tr>`,
+      )
+      .join("");
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 }
 
 window.showReturnModal = async () => {
-  document.getElementById('return-form').reset();
-  document.getElementById('ret-date').value = fmt.today();
+  document.getElementById("return-form").reset();
+  document.getElementById("ret-date").value = fmt.today();
   try {
-    const prods = await api.get('/api/products');
-    document.getElementById('ret-product').innerHTML = '<option value="">-- เลือก --</option>' + prods.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-    const sales = await api.get('/api/sales');
-    document.getElementById('ret-order').innerHTML = '<option value="">-- ไม่ระบุ --</option>' + sales.map(s => `<option value="${s.id}">#${s.id} - ${s.customer_name || '-'}</option>`).join('');
+    const prods = await api.get("/api/products");
+    document.getElementById("ret-product").innerHTML =
+      '<option value="">-- เลือก --</option>' +
+      prods.map((p) => `<option value="${p.id}">${p.name}</option>`).join("");
+    const sales = await api.get("/api/sales");
+    document.getElementById("ret-order").innerHTML =
+      '<option value="">-- ไม่ระบุ --</option>' +
+      sales
+        .map(
+          (s) =>
+            `<option value="${s.id}">#${s.id} - ${s.customer_name || "-"}</option>`,
+        )
+        .join("");
   } catch {}
-  new bootstrap.Modal('#returnModal').show();
+  new bootstrap.Modal("#returnModal").show();
 };
 
 window.saveReturn = async () => {
   const body = {
-    product_id: parseInt(document.getElementById('ret-product').value),
-    order_id: parseInt(document.getElementById('ret-order').value) || null,
-    quantity: parseInt(document.getElementById('ret-qty').value),
-    batch_number: document.getElementById('ret-batch').value.trim(),
-    return_date: document.getElementById('ret-date').value,
-    reason: document.getElementById('ret-reason').value,
-    notes: document.getElementById('ret-notes').value.trim(),
+    product_id: parseInt(document.getElementById("ret-product").value),
+    order_id: parseInt(document.getElementById("ret-order").value) || null,
+    quantity: parseInt(document.getElementById("ret-qty").value),
+    batch_number: document.getElementById("ret-batch").value.trim(),
+    return_date: document.getElementById("ret-date").value,
+    reason: document.getElementById("ret-reason").value,
+    notes: document.getElementById("ret-notes").value.trim(),
   };
-  if (!body.product_id || !body.quantity || !body.return_date) return toast('กรุณากรอกข้อมูลให้ครบ', 'warning');
+  if (!body.product_id || !body.quantity || !body.return_date)
+    return toast("กรุณากรอกข้อมูลให้ครบ", "warning");
   try {
-    await api.post('/api/returns', body);
-    bootstrap.Modal.getInstance(document.getElementById('returnModal')).hide();
-    toast('บันทึกคืนสินค้าสำเร็จ');
+    await api.post("/api/returns", body);
+    bootstrap.Modal.getInstance(document.getElementById("returnModal")).hide();
+    toast("บันทึกคืนสินค้าสำเร็จ");
     loadReturns();
-  } catch (err) { toast(err.message, 'danger'); }
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 window.approveReturn = async (id) => {
-  if (!confirm('อนุมัติการคืนสินค้านี้? (สินค้าจะถูกเพิ่มกลับเข้าสต็อก)')) return;
-  try { await api.put('/api/returns/' + id, { status: 'approved', action_taken: 'restock' }); toast('อนุมัติสำเร็จ'); loadReturns(); }
-  catch (err) { toast(err.message, 'danger'); }
+  if (!confirm("อนุมัติการคืนสินค้านี้? (สินค้าจะถูกเพิ่มกลับเข้าสต็อก)"))
+    return;
+  try {
+    await api.put("/api/returns/" + id, {
+      status: "approved",
+      action_taken: "restock",
+    });
+    toast("อนุมัติสำเร็จ");
+    loadReturns();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 window.rejectReturn = async (id) => {
-  if (!confirm('ปฏิเสธการคืนสินค้านี้?')) return;
-  try { await api.put('/api/returns/' + id, { status: 'rejected' }); toast('ปฏิเสธสำเร็จ'); loadReturns(); }
-  catch (err) { toast(err.message, 'danger'); }
+  if (!confirm("ปฏิเสธการคืนสินค้านี้?")) return;
+  try {
+    await api.put("/api/returns/" + id, { status: "rejected" });
+    toast("ปฏิเสธสำเร็จ");
+    loadReturns();
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 };
 
 // ─── AUDIT LOGS ──────────────────────────────────────────────────────
 async function loadAuditLogs() {
-  if (currentUser?.role !== 'admin') {
-    document.getElementById('audit-table').innerHTML = '<tr><td colspan="6" class="text-center text-danger">เฉพาะผู้ดูแลระบบเท่านั้น</td></tr>';
+  if (!["admin","manager"].includes(currentUser?.role)) {
+    document.getElementById("audit-table").innerHTML =
+      '<tr><td colspan="6" class="text-center text-danger">เฉพาะผู้ดูแลระบบเท่านั้น</td></tr>';
     return;
   }
   try {
-    const data = await api.get('/api/audit-logs');
-    document.getElementById('audit-table').innerHTML = data.map(l => `<tr>
-      <td>${new Date(l.created_at).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})}</td>
-      <td>${l.user_name || '-'}</td>
+    const data = await api.get("/api/audit-logs");
+    document.getElementById("audit-table").innerHTML = data
+      .map(
+        (l) => `<tr>
+      <td>${new Date(l.created_at).toLocaleString("th-TH", { dateStyle: "short", timeStyle: "short" })}</td>
+      <td>${l.user_name || "-"}</td>
       <td><span class="badge bg-secondary">${l.action}</span></td>
-      <td>${l.entity || '-'}</td>
-      <td>${l.entity_id || '-'}</td>
-      <td class="small">${l.details || '-'}</td>
-    </tr>`).join('');
-  } catch (err) { toast(err.message, 'danger'); }
+      <td>${l.entity || "-"}</td>
+      <td>${l.entity_id || "-"}</td>
+      <td class="small">${l.details || "-"}</td>
+    </tr>`,
+      )
+      .join("");
+  } catch (err) {
+    toast(err.message, "danger");
+  }
 }
 
 // ─── QUICK ACTION HELPERS ─────────────────────────────────────────────────────
@@ -3007,7 +3238,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const users = {
   data: [],
   async load() {
-    if (currentUser?.role !== "admin") {
+    if (!["admin","manager"].includes(currentUser?.role)) {
       document.getElementById("users-tbody").innerHTML =
         '<tr><td colspan="7" class="text-center text-danger">ไม่มีสิทธิ์เข้าถึง</td></tr>';
       return;

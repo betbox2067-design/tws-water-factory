@@ -190,7 +190,8 @@
           </li>
           <li>
             <a href="#" class="nav-link" data-page="qc"
-              ><i class="bi bi-clipboard2-check"></i><span>QC คุณภาพน้ำ</span></a
+              ><i class="bi bi-clipboard2-check"></i
+              ><span>QC คุณภาพน้ำ</span></a
             >
           </li>
 
@@ -261,13 +262,13 @@
             >
           </li>
 
-          <li class="nav-section admin-only">จัดการระบบ</li>
-          <li class="admin-only">
+          <li class="nav-section manager-only">จัดการระบบ</li>
+          <li class="manager-only">
             <a href="#" class="nav-link" data-page="users"
               ><i class="bi bi-shield-lock-fill"></i><span>ผู้ใช้งาน</span></a
             >
           </li>
-          <li class="admin-only">
+          <li class="manager-only">
             <a href="#" class="nav-link" data-page="audit-logs"
               ><i class="bi bi-journal-text"></i><span>ประวัติระบบ</span></a
             >
@@ -1551,113 +1552,391 @@
 
           <!-- ═══════════════════ QC คุณภาพน้ำ ═══════════════════ -->
           <div class="page d-none" id="page-qc">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <h5 class="mb-0"><i class="bi bi-clipboard2-check me-2"></i>ตรวจสอบคุณภาพน้ำ (QC)</h5>
-              <button class="btn btn-primary btn-sm" onclick="showQcModal()"><i class="bi bi-plus-lg me-1"></i>บันทึกผลตรวจ</button>
+            <div
+              class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2"
+            >
+              <h5 class="mb-0">
+                <i class="bi bi-clipboard2-check me-2"></i>ตรวจสอบคุณภาพน้ำ (QC)
+              </h5>
+              <button class="btn btn-primary btn-sm" onclick="showQcModal()">
+                <i class="bi bi-plus-lg me-1"></i>บันทึกผลตรวจ
+              </button>
             </div>
             <div class="row g-3 mb-3">
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ผ่านทดสอบ</div><div class="stat-value text-success" id="qc-pass">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ไม่ผ่าน</div><div class="stat-value text-danger" id="qc-fail">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">รอผล</div><div class="stat-value text-warning" id="qc-pending">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ค่า pH เฉลี่ย</div><div class="stat-value" id="qc-avg-ph">-</div></div></div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ผ่านทดสอบ</div>
+                  <div class="stat-value text-success" id="qc-pass">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ไม่ผ่าน</div>
+                  <div class="stat-value text-danger" id="qc-fail">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">รอผล</div>
+                  <div class="stat-value text-warning" id="qc-pending">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ค่า pH เฉลี่ย</div>
+                  <div class="stat-value" id="qc-avg-ph">-</div>
+                </div>
+              </div>
             </div>
-            <div class="table-responsive"><table class="table table-hover table-sm"><thead><tr><th>วันที่</th><th>เลขล็อต</th><th>สินค้า</th><th>pH</th><th>TDS</th><th>Turbidity</th><th>Chlorine</th><th>แบคทีเรีย</th><th>ผลตรวจ</th><th>ผู้ตรวจ</th><th></th></tr></thead><tbody id="qc-table"></tbody></table></div>
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead>
+                  <tr>
+                    <th>วันที่</th>
+                    <th>เลขล็อต</th>
+                    <th>สินค้า</th>
+                    <th>pH</th>
+                    <th>TDS</th>
+                    <th>Turbidity</th>
+                    <th>Chlorine</th>
+                    <th>แบคทีเรีย</th>
+                    <th>ผลตรวจ</th>
+                    <th>ผู้ตรวจ</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="qc-table"></tbody>
+              </table>
+            </div>
           </div>
 
           <!-- ═══════════════════ ซัพพลายเออร์ ═══════════════════ -->
           <div class="page d-none" id="page-suppliers">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <h5 class="mb-0"><i class="bi bi-building me-2"></i>ซัพพลายเออร์</h5>
-              <button class="btn btn-primary btn-sm" onclick="showSupplierModal()"><i class="bi bi-plus-lg me-1"></i>เพิ่มซัพพลายเออร์</button>
+            <div
+              class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2"
+            >
+              <h5 class="mb-0">
+                <i class="bi bi-building me-2"></i>ซัพพลายเออร์
+              </h5>
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="showSupplierModal()"
+              >
+                <i class="bi bi-plus-lg me-1"></i>เพิ่มซัพพลายเออร์
+              </button>
             </div>
             <div class="row g-3" id="suppliers-grid"></div>
           </div>
 
           <!-- ═══════════════════ ใบสั่งซื้อ ═══════════════════ -->
           <div class="page d-none" id="page-purchase-orders">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>ใบสั่งซื้อวัตถุดิบ</h5>
-              <button class="btn btn-primary btn-sm" onclick="showPOModal()"><i class="bi bi-plus-lg me-1"></i>สร้างใบสั่งซื้อ</button>
+            <div
+              class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2"
+            >
+              <h5 class="mb-0">
+                <i class="bi bi-receipt me-2"></i>ใบสั่งซื้อวัตถุดิบ
+              </h5>
+              <button class="btn btn-primary btn-sm" onclick="showPOModal()">
+                <i class="bi bi-plus-lg me-1"></i>สร้างใบสั่งซื้อ
+              </button>
             </div>
             <div class="row g-3 mb-3">
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ฉบับร่าง</div><div class="stat-value" id="po-draft">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">อนุมัติแล้ว</div><div class="stat-value text-primary" id="po-approved">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">รับของแล้ว</div><div class="stat-value text-success" id="po-received">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">มูลค่ารวม</div><div class="stat-value" id="po-total">฿0</div></div></div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ฉบับร่าง</div>
+                  <div class="stat-value" id="po-draft">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">อนุมัติแล้ว</div>
+                  <div class="stat-value text-primary" id="po-approved">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">รับของแล้ว</div>
+                  <div class="stat-value text-success" id="po-received">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">มูลค่ารวม</div>
+                  <div class="stat-value" id="po-total">฿0</div>
+                </div>
+              </div>
             </div>
-            <div class="table-responsive"><table class="table table-hover table-sm"><thead><tr><th>เลขที่ PO</th><th>ซัพพลายเออร์</th><th>วันที่สั่ง</th><th>วันที่คาดรับ</th><th>มูลค่า</th><th>สถานะ</th><th></th></tr></thead><tbody id="po-table"></tbody></table></div>
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead>
+                  <tr>
+                    <th>เลขที่ PO</th>
+                    <th>ซัพพลายเออร์</th>
+                    <th>วันที่สั่ง</th>
+                    <th>วันที่คาดรับ</th>
+                    <th>มูลค่า</th>
+                    <th>สถานะ</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="po-table"></tbody>
+              </table>
+            </div>
           </div>
 
           <!-- ═══════════════════ ค่าใช้จ่าย ═══════════════════ -->
           <div class="page d-none" id="page-expenses">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <h5 class="mb-0"><i class="bi bi-cash-stack me-2"></i>ค่าใช้จ่าย</h5>
+            <div
+              class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2"
+            >
+              <h5 class="mb-0">
+                <i class="bi bi-cash-stack me-2"></i>ค่าใช้จ่าย
+              </h5>
               <div class="d-flex gap-2">
-                <input type="month" class="form-control form-control-sm" id="exp-month" onchange="loadExpenses()">
-                <button class="btn btn-primary btn-sm" onclick="showExpenseModal()"><i class="bi bi-plus-lg me-1"></i>บันทึกค่าใช้จ่าย</button>
+                <input
+                  type="month"
+                  class="form-control form-control-sm"
+                  id="exp-month"
+                  onchange="loadExpenses()"
+                />
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="showExpenseModal()"
+                >
+                  <i class="bi bi-plus-lg me-1"></i>บันทึกค่าใช้จ่าย
+                </button>
               </div>
             </div>
             <div class="row g-3 mb-3">
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ค่าใช้จ่ายเดือนนี้</div><div class="stat-value text-danger" id="exp-month-total">฿0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ไฟฟ้า</div><div class="stat-value" id="exp-electric">฿0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">น้ำประปา</div><div class="stat-value" id="exp-water">฿0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">อื่นๆ</div><div class="stat-value" id="exp-other">฿0</div></div></div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ค่าใช้จ่ายเดือนนี้</div>
+                  <div class="stat-value text-danger" id="exp-month-total">
+                    ฿0
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ไฟฟ้า</div>
+                  <div class="stat-value" id="exp-electric">฿0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">น้ำประปา</div>
+                  <div class="stat-value" id="exp-water">฿0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">อื่นๆ</div>
+                  <div class="stat-value" id="exp-other">฿0</div>
+                </div>
+              </div>
             </div>
-            <div class="table-responsive"><table class="table table-hover table-sm"><thead><tr><th>วันที่</th><th>หมวด</th><th>รายละเอียด</th><th>ผู้ขาย</th><th>จำนวนเงิน</th><th>อ้างอิง</th><th></th></tr></thead><tbody id="exp-table"></tbody></table></div>
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead>
+                  <tr>
+                    <th>วันที่</th>
+                    <th>หมวด</th>
+                    <th>รายละเอียด</th>
+                    <th>ผู้ขาย</th>
+                    <th>จำนวนเงิน</th>
+                    <th>อ้างอิง</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="exp-table"></tbody>
+              </table>
+            </div>
           </div>
 
           <!-- ═══════════════════ ซ่อมบำรุง ═══════════════════ -->
           <div class="page d-none" id="page-maintenance">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <h5 class="mb-0"><i class="bi bi-wrench-adjustable me-2"></i>เครื่องจักร & ซ่อมบำรุง</h5>
+            <div
+              class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2"
+            >
+              <h5 class="mb-0">
+                <i class="bi bi-wrench-adjustable me-2"></i>เครื่องจักร &
+                ซ่อมบำรุง
+              </h5>
               <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary btn-sm" onclick="showEquipmentModal()"><i class="bi bi-plus-lg me-1"></i>เพิ่มเครื่องจักร</button>
-                <button class="btn btn-primary btn-sm" onclick="showMaintenanceModal()"><i class="bi bi-tools me-1"></i>บันทึกซ่อมบำรุง</button>
+                <button
+                  class="btn btn-outline-primary btn-sm"
+                  onclick="showEquipmentModal()"
+                >
+                  <i class="bi bi-plus-lg me-1"></i>เพิ่มเครื่องจักร
+                </button>
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="showMaintenanceModal()"
+                >
+                  <i class="bi bi-tools me-1"></i>บันทึกซ่อมบำรุง
+                </button>
               </div>
             </div>
             <div class="row g-3 mb-3">
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">เครื่องจักรทั้งหมด</div><div class="stat-value" id="eq-total">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ใช้งานปกติ</div><div class="stat-value text-success" id="eq-active">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ซ่อมบำรุง</div><div class="stat-value text-warning" id="eq-maint">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ถึงกำหนดซ่อม</div><div class="stat-value text-danger" id="eq-due">0</div></div></div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">เครื่องจักรทั้งหมด</div>
+                  <div class="stat-value" id="eq-total">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ใช้งานปกติ</div>
+                  <div class="stat-value text-success" id="eq-active">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ซ่อมบำรุง</div>
+                  <div class="stat-value text-warning" id="eq-maint">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ถึงกำหนดซ่อม</div>
+                  <div class="stat-value text-danger" id="eq-due">0</div>
+                </div>
+              </div>
             </div>
             <div class="row g-3" id="equipment-grid"></div>
           </div>
 
           <!-- ═══════════════════ ถังมัดจำ ═══════════════════ -->
           <div class="page d-none" id="page-deposits">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div
+              class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2"
+            >
               <h5 class="mb-0"><i class="bi bi-archive me-2"></i>ถังมัดจำ</h5>
-              <button class="btn btn-primary btn-sm" onclick="showDepositModal()"><i class="bi bi-plus-lg me-1"></i>บันทึกถังมัดจำ</button>
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="showDepositModal()"
+              >
+                <i class="bi bi-plus-lg me-1"></i>บันทึกถังมัดจำ
+              </button>
             </div>
             <div class="row g-3 mb-3">
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ส่งออกทั้งหมด</div><div class="stat-value" id="dep-out">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">รับคืนแล้ว</div><div class="stat-value text-success" id="dep-returned">0</div></div></div>
-              <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-label">ค้างอยู่</div><div class="stat-value text-warning" id="dep-outstanding">0</div></div></div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ส่งออกทั้งหมด</div>
+                  <div class="stat-value" id="dep-out">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">รับคืนแล้ว</div>
+                  <div class="stat-value text-success" id="dep-returned">0</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-label">ค้างอยู่</div>
+                  <div class="stat-value text-warning" id="dep-outstanding">
+                    0
+                  </div>
+                </div>
+              </div>
             </div>
-            <h6 class="mt-3 mb-2"><i class="bi bi-people me-1"></i>สรุปตามลูกค้า</h6>
-            <div class="table-responsive mb-3"><table class="table table-hover table-sm"><thead><tr><th>ลูกค้า</th><th>โทร</th><th>ส่งออก</th><th>รับคืน</th><th>ค้างอยู่</th><th>มัดจำ (฿)</th></tr></thead><tbody id="dep-summary-table"></tbody></table></div>
-            <h6 class="mt-3 mb-2"><i class="bi bi-clock-history me-1"></i>รายการล่าสุด</h6>
-            <div class="table-responsive"><table class="table table-hover table-sm"><thead><tr><th>วันที่</th><th>ลูกค้า</th><th>ประเภท</th><th>ส่งออก</th><th>รับคืน</th><th>มัดจำ</th><th>หมายเหตุ</th></tr></thead><tbody id="dep-table"></tbody></table></div>
+            <h6 class="mt-3 mb-2">
+              <i class="bi bi-people me-1"></i>สรุปตามลูกค้า
+            </h6>
+            <div class="table-responsive mb-3">
+              <table class="table table-hover table-sm">
+                <thead>
+                  <tr>
+                    <th>ลูกค้า</th>
+                    <th>โทร</th>
+                    <th>ส่งออก</th>
+                    <th>รับคืน</th>
+                    <th>ค้างอยู่</th>
+                    <th>มัดจำ (฿)</th>
+                  </tr>
+                </thead>
+                <tbody id="dep-summary-table"></tbody>
+              </table>
+            </div>
+            <h6 class="mt-3 mb-2">
+              <i class="bi bi-clock-history me-1"></i>รายการล่าสุด
+            </h6>
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead>
+                  <tr>
+                    <th>วันที่</th>
+                    <th>ลูกค้า</th>
+                    <th>ประเภท</th>
+                    <th>ส่งออก</th>
+                    <th>รับคืน</th>
+                    <th>มัดจำ</th>
+                    <th>หมายเหตุ</th>
+                  </tr>
+                </thead>
+                <tbody id="dep-table"></tbody>
+              </table>
+            </div>
           </div>
 
           <!-- ═══════════════════ คืนสินค้า ═══════════════════ -->
           <div class="page d-none" id="page-returns">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <h5 class="mb-0"><i class="bi bi-arrow-return-left me-2"></i>คืนสินค้า / ของเสีย</h5>
-              <button class="btn btn-primary btn-sm" onclick="showReturnModal()"><i class="bi bi-plus-lg me-1"></i>บันทึกคืนสินค้า</button>
+            <div
+              class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2"
+            >
+              <h5 class="mb-0">
+                <i class="bi bi-arrow-return-left me-2"></i>คืนสินค้า / ของเสีย
+              </h5>
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="showReturnModal()"
+              >
+                <i class="bi bi-plus-lg me-1"></i>บันทึกคืนสินค้า
+              </button>
             </div>
-            <div class="table-responsive"><table class="table table-hover table-sm"><thead><tr><th>วันที่</th><th>เลขที่ใบขาย</th><th>สินค้า</th><th>เลขล็อต</th><th>จำนวน</th><th>เหตุผล</th><th>สถานะ</th><th></th></tr></thead><tbody id="returns-table"></tbody></table></div>
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead>
+                  <tr>
+                    <th>วันที่</th>
+                    <th>เลขที่ใบขาย</th>
+                    <th>สินค้า</th>
+                    <th>เลขล็อต</th>
+                    <th>จำนวน</th>
+                    <th>เหตุผล</th>
+                    <th>สถานะ</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="returns-table"></tbody>
+              </table>
+            </div>
           </div>
 
           <!-- ═══════════════════ ประวัติระบบ (Audit) ═══════════════════ -->
           <div class="page d-none" id="page-audit-logs">
             <div class="page-header">
-              <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>ประวัติการใช้งานระบบ</h5>
+              <h5 class="mb-0">
+                <i class="bi bi-journal-text me-2"></i>ประวัติการใช้งานระบบ
+              </h5>
             </div>
-            <div class="table-responsive"><table class="table table-hover table-sm"><thead><tr><th>เวลา</th><th>ผู้ใช้</th><th>การกระทำ</th><th>หมวด</th><th>รหัส</th><th>รายละเอียด</th></tr></thead><tbody id="audit-table"></tbody></table></div>
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead>
+                  <tr>
+                    <th>เวลา</th>
+                    <th>ผู้ใช้</th>
+                    <th>การกระทำ</th>
+                    <th>หมวด</th>
+                    <th>รหัส</th>
+                    <th>รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-table"></tbody>
+              </table>
+            </div>
           </div>
-
         </div>
         <!-- /content-area -->
       </div>
@@ -2586,28 +2865,125 @@
     <div class="modal fade" id="qcModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title"><i class="bi bi-clipboard2-check me-2"></i>ผลตรวจคุณภาพน้ำ</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-clipboard2-check me-2"></i>ผลตรวจคุณภาพน้ำ
+            </h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
           <div class="modal-body">
             <form id="qc-form">
-              <input type="hidden" id="qc-id">
+              <input type="hidden" id="qc-id" />
               <div class="row g-2">
-                <div class="col-md-4"><label class="form-label">เลขล็อตผลิต</label><select class="form-select" id="qc-batch"></select></div>
-                <div class="col-md-4"><label class="form-label">วันที่ทดสอบ <span class="text-danger">*</span></label><input type="date" class="form-control" id="qc-date"></div>
-                <div class="col-md-4"><label class="form-label">ผู้ทดสอบ</label><input type="text" class="form-control" id="qc-tester"></div>
-                <div class="col-md-3"><label class="form-label">pH (6.5-8.5)</label><input type="number" step="0.01" class="form-control" id="qc-ph" placeholder="7.0"></div>
-                <div class="col-md-3"><label class="form-label">TDS (≤500 ppm)</label><input type="number" step="0.1" class="form-control" id="qc-tds" placeholder="100"></div>
-                <div class="col-md-3"><label class="form-label">Turbidity (≤5 NTU)</label><input type="number" step="0.01" class="form-control" id="qc-turbidity" placeholder="0.5"></div>
-                <div class="col-md-3"><label class="form-label">Chlorine (ppm)</label><input type="number" step="0.01" class="form-control" id="qc-chlorine" placeholder="0.2"></div>
-                <div class="col-md-3"><label class="form-label">แบคทีเรีย (CFU/ml)</label><input type="number" step="0.1" class="form-control" id="qc-bacteria" placeholder="0"></div>
-                <div class="col-md-3"><label class="form-label">สี (Pt-Co)</label><input type="number" step="0.1" class="form-control" id="qc-color" placeholder="0"></div>
-                <div class="col-md-3"><label class="form-label">กลิ่น</label><select class="form-select" id="qc-odor"><option>ปกติ</option><option>ผิดปกติ</option></select></div>
-                <div class="col-md-3"><label class="form-label">รสชาติ</label><select class="form-select" id="qc-taste"><option>ปกติ</option><option>ผิดปกติ</option></select></div>
-                <div class="col-md-6"><label class="form-label">ผลตรวจ</label><select class="form-select" id="qc-result"><option value="pending">รอผล</option><option value="pass">ผ่าน</option><option value="fail">ไม่ผ่าน</option></select></div>
-                <div class="col-md-6"><label class="form-label">หมายเหตุ</label><input type="text" class="form-control" id="qc-notes"></div>
+                <div class="col-md-4">
+                  <label class="form-label">เลขล็อตผลิต</label
+                  ><select class="form-select" id="qc-batch"></select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >วันที่ทดสอบ <span class="text-danger">*</span></label
+                  ><input type="date" class="form-control" id="qc-date" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">ผู้ทดสอบ</label
+                  ><input type="text" class="form-control" id="qc-tester" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">pH (6.5-8.5)</label
+                  ><input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    id="qc-ph"
+                    placeholder="7.0"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">TDS (≤500 ppm)</label
+                  ><input
+                    type="number"
+                    step="0.1"
+                    class="form-control"
+                    id="qc-tds"
+                    placeholder="100"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Turbidity (≤5 NTU)</label
+                  ><input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    id="qc-turbidity"
+                    placeholder="0.5"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Chlorine (ppm)</label
+                  ><input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    id="qc-chlorine"
+                    placeholder="0.2"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">แบคทีเรีย (CFU/ml)</label
+                  ><input
+                    type="number"
+                    step="0.1"
+                    class="form-control"
+                    id="qc-bacteria"
+                    placeholder="0"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">สี (Pt-Co)</label
+                  ><input
+                    type="number"
+                    step="0.1"
+                    class="form-control"
+                    id="qc-color"
+                    placeholder="0"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">กลิ่น</label
+                  ><select class="form-select" id="qc-odor">
+                    <option>ปกติ</option>
+                    <option>ผิดปกติ</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">รสชาติ</label
+                  ><select class="form-select" id="qc-taste">
+                    <option>ปกติ</option>
+                    <option>ผิดปกติ</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">ผลตรวจ</label
+                  ><select class="form-select" id="qc-result">
+                    <option value="pending">รอผล</option>
+                    <option value="pass">ผ่าน</option>
+                    <option value="fail">ไม่ผ่าน</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">หมายเหตุ</label
+                  ><input type="text" class="form-control" id="qc-notes" />
+                </div>
               </div>
             </form>
           </div>
-          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button><button class="btn btn-dark" onclick="saveQc()"><i class="bi bi-save me-1"></i>บันทึก</button></div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-dark" onclick="saveQc()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2616,22 +2992,65 @@
     <div class="modal fade" id="supplierModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title"><i class="bi bi-building me-2"></i>ซัพพลายเออร์</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-building me-2"></i>ซัพพลายเออร์
+            </h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
           <div class="modal-body">
             <form id="supplier-form">
-              <input type="hidden" id="sup-id">
+              <input type="hidden" id="sup-id" />
               <div class="row g-2">
-                <div class="col-md-4"><label class="form-label">รหัส <span class="text-danger">*</span></label><input type="text" class="form-control" id="sup-code" placeholder="SUP001"></div>
-                <div class="col-md-8"><label class="form-label">ชื่อ <span class="text-danger">*</span></label><input type="text" class="form-control" id="sup-name"></div>
-                <div class="col-md-6"><label class="form-label">ผู้ติดต่อ</label><input type="text" class="form-control" id="sup-contact"></div>
-                <div class="col-md-6"><label class="form-label">โทรศัพท์</label><input type="text" class="form-control" id="sup-phone"></div>
-                <div class="col-md-6"><label class="form-label">อีเมล</label><input type="email" class="form-control" id="sup-email"></div>
-                <div class="col-md-6"><label class="form-label">ที่อยู่</label><input type="text" class="form-control" id="sup-address"></div>
-                <div class="col-12"><label class="form-label">หมายเหตุ</label><textarea class="form-control" id="sup-notes" rows="2"></textarea></div>
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >รหัส <span class="text-danger">*</span></label
+                  ><input
+                    type="text"
+                    class="form-control"
+                    id="sup-code"
+                    placeholder="SUP001"
+                  />
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label"
+                    >ชื่อ <span class="text-danger">*</span></label
+                  ><input type="text" class="form-control" id="sup-name" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">ผู้ติดต่อ</label
+                  ><input type="text" class="form-control" id="sup-contact" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">โทรศัพท์</label
+                  ><input type="text" class="form-control" id="sup-phone" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">อีเมล</label
+                  ><input type="email" class="form-control" id="sup-email" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">ที่อยู่</label
+                  ><input type="text" class="form-control" id="sup-address" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">หมายเหตุ</label
+                  ><textarea
+                    class="form-control"
+                    id="sup-notes"
+                    rows="2"
+                  ></textarea>
+                </div>
               </div>
             </form>
           </div>
-          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button><button class="btn btn-dark" onclick="saveSupplier()"><i class="bi bi-save me-1"></i>บันทึก</button></div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-dark" onclick="saveSupplier()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2640,22 +3059,55 @@
     <div class="modal fade" id="poModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title"><i class="bi bi-receipt me-2"></i>ใบสั่งซื้อวัตถุดิบ</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-receipt me-2"></i>ใบสั่งซื้อวัตถุดิบ
+            </h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
           <div class="modal-body">
             <form id="po-form">
               <div class="row g-2 mb-3">
-                <div class="col-md-4"><label class="form-label">ซัพพลายเออร์ <span class="text-danger">*</span></label><select class="form-select" id="po-supplier"></select></div>
-                <div class="col-md-4"><label class="form-label">วันที่สั่ง <span class="text-danger">*</span></label><input type="date" class="form-control" id="po-date"></div>
-                <div class="col-md-4"><label class="form-label">วันที่คาดรับ</label><input type="date" class="form-control" id="po-expected"></div>
-                <div class="col-12"><label class="form-label">หมายเหตุ</label><input type="text" class="form-control" id="po-notes"></div>
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >ซัพพลายเออร์ <span class="text-danger">*</span></label
+                  ><select class="form-select" id="po-supplier"></select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >วันที่สั่ง <span class="text-danger">*</span></label
+                  ><input type="date" class="form-control" id="po-date" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">วันที่คาดรับ</label
+                  ><input type="date" class="form-control" id="po-expected" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">หมายเหตุ</label
+                  ><input type="text" class="form-control" id="po-notes" />
+                </div>
               </div>
               <h6>รายการวัตถุดิบ</h6>
               <div id="po-items-container"></div>
-              <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addPOItem()"><i class="bi bi-plus-lg me-1"></i>เพิ่มรายการ</button>
-              <div class="text-end mt-2 fw-bold">รวม: <span id="po-total-display">฿0</span></div>
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm mt-2"
+                onclick="addPOItem()"
+              >
+                <i class="bi bi-plus-lg me-1"></i>เพิ่มรายการ
+              </button>
+              <div class="text-end mt-2 fw-bold">
+                รวม: <span id="po-total-display">฿0</span>
+              </div>
             </form>
           </div>
-          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button><button class="btn btn-dark" onclick="savePO()"><i class="bi bi-save me-1"></i>บันทึก</button></div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-dark" onclick="savePO()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2664,21 +3116,69 @@
     <div class="modal fade" id="expenseModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title"><i class="bi bi-cash-stack me-2"></i>บันทึกค่าใช้จ่าย</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-cash-stack me-2"></i>บันทึกค่าใช้จ่าย
+            </h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
           <div class="modal-body">
             <form id="expense-form">
-              <input type="hidden" id="exp-id">
+              <input type="hidden" id="exp-id" />
               <div class="row g-2">
-                <div class="col-md-6"><label class="form-label">หมวด <span class="text-danger">*</span></label><select class="form-select" id="exp-category"><option value="electricity">ค่าไฟฟ้า</option><option value="water">ค่าน้ำประปา</option><option value="labor">ค่าแรงงาน</option><option value="fuel">ค่าเชื้อเพลิง</option><option value="maintenance">ค่าซ่อมบำรุง</option><option value="packaging">ค่าบรรจุภัณฑ์</option><option value="transport">ค่าขนส่ง</option><option value="rent">ค่าเช่า</option><option value="other">อื่นๆ</option></select></div>
-                <div class="col-md-6"><label class="form-label">จำนวนเงิน <span class="text-danger">*</span></label><input type="number" step="0.01" class="form-control" id="exp-amount" min="0"></div>
-                <div class="col-md-6"><label class="form-label">วันที่ <span class="text-danger">*</span></label><input type="date" class="form-control" id="exp-date"></div>
-                <div class="col-md-6"><label class="form-label">ผู้ขาย/ร้านค้า</label><input type="text" class="form-control" id="exp-vendor"></div>
-                <div class="col-12"><label class="form-label">รายละเอียด</label><input type="text" class="form-control" id="exp-desc"></div>
-                <div class="col-12"><label class="form-label">เลขอ้างอิง/ใบเสร็จ</label><input type="text" class="form-control" id="exp-ref"></div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >หมวด <span class="text-danger">*</span></label
+                  ><select class="form-select" id="exp-category">
+                    <option value="electricity">ค่าไฟฟ้า</option>
+                    <option value="water">ค่าน้ำประปา</option>
+                    <option value="labor">ค่าแรงงาน</option>
+                    <option value="fuel">ค่าเชื้อเพลิง</option>
+                    <option value="maintenance">ค่าซ่อมบำรุง</option>
+                    <option value="packaging">ค่าบรรจุภัณฑ์</option>
+                    <option value="transport">ค่าขนส่ง</option>
+                    <option value="rent">ค่าเช่า</option>
+                    <option value="other">อื่นๆ</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >จำนวนเงิน <span class="text-danger">*</span></label
+                  ><input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    id="exp-amount"
+                    min="0"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >วันที่ <span class="text-danger">*</span></label
+                  ><input type="date" class="form-control" id="exp-date" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">ผู้ขาย/ร้านค้า</label
+                  ><input type="text" class="form-control" id="exp-vendor" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">รายละเอียด</label
+                  ><input type="text" class="form-control" id="exp-desc" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">เลขอ้างอิง/ใบเสร็จ</label
+                  ><input type="text" class="form-control" id="exp-ref" />
+                </div>
               </div>
             </form>
           </div>
-          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button><button class="btn btn-dark" onclick="saveExpense()"><i class="bi bi-save me-1"></i>บันทึก</button></div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-dark" onclick="saveExpense()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2687,23 +3187,72 @@
     <div class="modal fade" id="equipmentModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title"><i class="bi bi-gear me-2"></i>เครื่องจักร/อุปกรณ์</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-gear me-2"></i>เครื่องจักร/อุปกรณ์
+            </h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
           <div class="modal-body">
             <form id="equipment-form">
-              <input type="hidden" id="eq-id">
+              <input type="hidden" id="eq-id" />
               <div class="row g-2">
-                <div class="col-md-4"><label class="form-label">รหัส <span class="text-danger">*</span></label><input type="text" class="form-control" id="eq-code"></div>
-                <div class="col-md-8"><label class="form-label">ชื่อ <span class="text-danger">*</span></label><input type="text" class="form-control" id="eq-name"></div>
-                <div class="col-md-4"><label class="form-label">ประเภท</label><input type="text" class="form-control" id="eq-type"></div>
-                <div class="col-md-4"><label class="form-label">รุ่น</label><input type="text" class="form-control" id="eq-model"></div>
-                <div class="col-md-4"><label class="form-label">ตำแหน่ง</label><input type="text" class="form-control" id="eq-location"></div>
-                <div class="col-md-6"><label class="form-label">วันที่ซื้อ</label><input type="date" class="form-control" id="eq-purchase-date"></div>
-                <div class="col-md-6"><label class="form-label">สถานะ</label><select class="form-select" id="eq-status"><option value="active">ใช้งาน</option><option value="maintenance">ซ่อมบำรุง</option><option value="inactive">ไม่ใช้งาน</option></select></div>
-                <div class="col-12"><label class="form-label">หมายเหตุ</label><textarea class="form-control" id="eq-notes" rows="2"></textarea></div>
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >รหัส <span class="text-danger">*</span></label
+                  ><input type="text" class="form-control" id="eq-code" />
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label"
+                    >ชื่อ <span class="text-danger">*</span></label
+                  ><input type="text" class="form-control" id="eq-name" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">ประเภท</label
+                  ><input type="text" class="form-control" id="eq-type" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">รุ่น</label
+                  ><input type="text" class="form-control" id="eq-model" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">ตำแหน่ง</label
+                  ><input type="text" class="form-control" id="eq-location" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">วันที่ซื้อ</label
+                  ><input
+                    type="date"
+                    class="form-control"
+                    id="eq-purchase-date"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">สถานะ</label
+                  ><select class="form-select" id="eq-status">
+                    <option value="active">ใช้งาน</option>
+                    <option value="maintenance">ซ่อมบำรุง</option>
+                    <option value="inactive">ไม่ใช้งาน</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">หมายเหตุ</label
+                  ><textarea
+                    class="form-control"
+                    id="eq-notes"
+                    rows="2"
+                  ></textarea>
+                </div>
               </div>
             </form>
           </div>
-          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button><button class="btn btn-dark" onclick="saveEquipment()"><i class="bi bi-save me-1"></i>บันทึก</button></div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-dark" onclick="saveEquipment()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2712,22 +3261,74 @@
     <div class="modal fade" id="maintenanceModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title"><i class="bi bi-tools me-2"></i>บันทึกซ่อมบำรุง</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-tools me-2"></i>บันทึกซ่อมบำรุง
+            </h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
           <div class="modal-body">
             <form id="maintenance-form">
               <div class="row g-2">
-                <div class="col-md-6"><label class="form-label">เครื่องจักร <span class="text-danger">*</span></label><select class="form-select" id="mt-equipment"></select></div>
-                <div class="col-md-6"><label class="form-label">ประเภท <span class="text-danger">*</span></label><select class="form-select" id="mt-type"><option value="preventive">ป้องกัน (Preventive)</option><option value="corrective">แก้ไข (Corrective)</option><option value="filter_change">เปลี่ยนไส้กรอง</option><option value="uv_lamp">เปลี่ยนหลอด UV</option><option value="cleaning">ล้างทำความสะอาด</option><option value="calibration">สอบเทียบ</option><option value="other">อื่นๆ</option></select></div>
-                <div class="col-12"><label class="form-label">รายละเอียด</label><input type="text" class="form-control" id="mt-desc"></div>
-                <div class="col-md-4"><label class="form-label">ค่าใช้จ่าย</label><input type="number" step="0.01" class="form-control" id="mt-cost" min="0"></div>
-                <div class="col-md-4"><label class="form-label">ผู้ดำเนินการ</label><input type="text" class="form-control" id="mt-performer"></div>
-                <div class="col-md-4"><label class="form-label">วันที่ <span class="text-danger">*</span></label><input type="date" class="form-control" id="mt-date"></div>
-                <div class="col-md-6"><label class="form-label">กำหนดครั้งถัดไป</label><input type="date" class="form-control" id="mt-next"></div>
-                <div class="col-md-6"><label class="form-label">หมายเหตุ</label><input type="text" class="form-control" id="mt-notes"></div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >เครื่องจักร <span class="text-danger">*</span></label
+                  ><select class="form-select" id="mt-equipment"></select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >ประเภท <span class="text-danger">*</span></label
+                  ><select class="form-select" id="mt-type">
+                    <option value="preventive">ป้องกัน (Preventive)</option>
+                    <option value="corrective">แก้ไข (Corrective)</option>
+                    <option value="filter_change">เปลี่ยนไส้กรอง</option>
+                    <option value="uv_lamp">เปลี่ยนหลอด UV</option>
+                    <option value="cleaning">ล้างทำความสะอาด</option>
+                    <option value="calibration">สอบเทียบ</option>
+                    <option value="other">อื่นๆ</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">รายละเอียด</label
+                  ><input type="text" class="form-control" id="mt-desc" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">ค่าใช้จ่าย</label
+                  ><input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    id="mt-cost"
+                    min="0"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">ผู้ดำเนินการ</label
+                  ><input type="text" class="form-control" id="mt-performer" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >วันที่ <span class="text-danger">*</span></label
+                  ><input type="date" class="form-control" id="mt-date" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">กำหนดครั้งถัดไป</label
+                  ><input type="date" class="form-control" id="mt-next" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">หมายเหตุ</label
+                  ><input type="text" class="form-control" id="mt-notes" />
+                </div>
               </div>
             </form>
           </div>
-          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button><button class="btn btn-dark" onclick="saveMaintenance()"><i class="bi bi-save me-1"></i>บันทึก</button></div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-dark" onclick="saveMaintenance()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2736,21 +3337,76 @@
     <div class="modal fade" id="depositModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title"><i class="bi bi-archive me-2"></i>บันทึกถังมัดจำ</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-archive me-2"></i>บันทึกถังมัดจำ
+            </h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
           <div class="modal-body">
             <form id="deposit-form">
               <div class="row g-2">
-                <div class="col-md-6"><label class="form-label">ลูกค้า <span class="text-danger">*</span></label><select class="form-select" id="dep-customer"></select></div>
-                <div class="col-md-6"><label class="form-label">วันที่ <span class="text-danger">*</span></label><input type="date" class="form-control" id="dep-date"></div>
-                <div class="col-md-6"><label class="form-label">ประเภทถัง</label><select class="form-select" id="dep-type"><option>ถัง 19L</option><option>ถัง 5L</option></select></div>
-                <div class="col-md-6"><label class="form-label">ค่ามัดจำ (฿)</label><input type="number" step="0.01" class="form-control" id="dep-amount" min="0"></div>
-                <div class="col-md-6"><label class="form-label">ส่งออก (จำนวน)</label><input type="number" class="form-control" id="dep-qty-out" min="0" value="0"></div>
-                <div class="col-md-6"><label class="form-label">รับคืน (จำนวน)</label><input type="number" class="form-control" id="dep-qty-return" min="0" value="0"></div>
-                <div class="col-12"><label class="form-label">หมายเหตุ</label><input type="text" class="form-control" id="dep-notes"></div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >ลูกค้า <span class="text-danger">*</span></label
+                  ><select class="form-select" id="dep-customer"></select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >วันที่ <span class="text-danger">*</span></label
+                  ><input type="date" class="form-control" id="dep-date" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">ประเภทถัง</label
+                  ><select class="form-select" id="dep-type">
+                    <option>ถัง 19L</option>
+                    <option>ถัง 5L</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">ค่ามัดจำ (฿)</label
+                  ><input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    id="dep-amount"
+                    min="0"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">ส่งออก (จำนวน)</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="dep-qty-out"
+                    min="0"
+                    value="0"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">รับคืน (จำนวน)</label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="dep-qty-return"
+                    min="0"
+                    value="0"
+                  />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">หมายเหตุ</label
+                  ><input type="text" class="form-control" id="dep-notes" />
+                </div>
               </div>
             </form>
           </div>
-          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button><button class="btn btn-dark" onclick="saveDeposit()"><i class="bi bi-save me-1"></i>บันทึก</button></div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-dark" onclick="saveDeposit()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2759,21 +3415,69 @@
     <div class="modal fade" id="returnModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title"><i class="bi bi-arrow-return-left me-2"></i>บันทึกคืนสินค้า</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-arrow-return-left me-2"></i>บันทึกคืนสินค้า
+            </h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
           <div class="modal-body">
             <form id="return-form">
               <div class="row g-2">
-                <div class="col-md-6"><label class="form-label">สินค้า <span class="text-danger">*</span></label><select class="form-select" id="ret-product"></select></div>
-                <div class="col-md-6"><label class="form-label">เลขที่ใบขาย</label><select class="form-select" id="ret-order"></select></div>
-                <div class="col-md-4"><label class="form-label">จำนวน <span class="text-danger">*</span></label><input type="number" class="form-control" id="ret-qty" min="1"></div>
-                <div class="col-md-4"><label class="form-label">เลขล็อต</label><input type="text" class="form-control" id="ret-batch"></div>
-                <div class="col-md-4"><label class="form-label">วันที่ <span class="text-danger">*</span></label><input type="date" class="form-control" id="ret-date"></div>
-                <div class="col-md-6"><label class="form-label">เหตุผล <span class="text-danger">*</span></label><select class="form-select" id="ret-reason"><option value="damaged">ชำรุดเสียหาย</option><option value="expired">หมดอายุ</option><option value="quality">คุณภาพไม่ผ่าน</option><option value="wrong_order">สั่งผิด</option><option value="excess">สินค้าเกิน</option><option value="other">อื่นๆ</option></select></div>
-                <div class="col-md-6"><label class="form-label">หมายเหตุ</label><input type="text" class="form-control" id="ret-notes"></div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >สินค้า <span class="text-danger">*</span></label
+                  ><select class="form-select" id="ret-product"></select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">เลขที่ใบขาย</label
+                  ><select class="form-select" id="ret-order"></select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >จำนวน <span class="text-danger">*</span></label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="ret-qty"
+                    min="1"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">เลขล็อต</label
+                  ><input type="text" class="form-control" id="ret-batch" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label"
+                    >วันที่ <span class="text-danger">*</span></label
+                  ><input type="date" class="form-control" id="ret-date" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >เหตุผล <span class="text-danger">*</span></label
+                  ><select class="form-select" id="ret-reason">
+                    <option value="damaged">ชำรุดเสียหาย</option>
+                    <option value="expired">หมดอายุ</option>
+                    <option value="quality">คุณภาพไม่ผ่าน</option>
+                    <option value="wrong_order">สั่งผิด</option>
+                    <option value="excess">สินค้าเกิน</option>
+                    <option value="other">อื่นๆ</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">หมายเหตุ</label
+                  ><input type="text" class="form-control" id="ret-notes" />
+                </div>
               </div>
             </form>
           </div>
-          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button><button class="btn btn-dark" onclick="saveReturn()"><i class="bi bi-save me-1"></i>บันทึก</button></div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก</button
+            ><button class="btn btn-dark" onclick="saveReturn()">
+              <i class="bi bi-save me-1"></i>บันทึก
+            </button>
+          </div>
         </div>
       </div>
     </div>
