@@ -744,7 +744,7 @@ app.put("/api/materials/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขสำเร็จ" });
 });
 
-app.delete("/api/materials/:id", auth(["admin"]), (req, res) => {
+app.delete("/api/materials/:id", auth(["admin","manager"]), (req, res) => {
   db.prepare("DELETE FROM raw_materials WHERE id=?").run(req.params.id);
   res.json({ message: "ลบสำเร็จ" });
 });
@@ -822,7 +822,7 @@ app.put("/api/products/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขสำเร็จ" });
 });
 
-app.delete("/api/products/:id", auth(["admin"]), (req, res) => {
+app.delete("/api/products/:id", auth(["admin","manager"]), (req, res) => {
   db.prepare("UPDATE products SET active=0 WHERE id=?").run(req.params.id);
   res.json({ message: "ลบสินค้าสำเร็จ" });
 });
@@ -848,12 +848,12 @@ app.post("/api/production", auth(), (req, res) => {
   if (!product_id || !quantity_planned)
     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบ" });
   const today = new Date().toISOString().split("T")[0].replace(/-/g, "");
-  const cnt = db
+  const maxDaily = db
     .prepare(
-      "SELECT COUNT(*) as c FROM production_orders WHERE DATE(created_at)=DATE('now')",
+      "SELECT COUNT(*) as c FROM production_orders WHERE DATE(created_at)=DATE('now') AND status!='cancelled'",
     )
     .get().c;
-  const batch_number = `B${today}-${String(cnt + 1).padStart(3, "0")}`;
+  const batch_number = `B${today}-${String(maxDaily + 1).padStart(3, "0")}`;
   const expiry_date = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
     .toISOString()
     .split("T")[0];
@@ -933,7 +933,7 @@ app.put("/api/production/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "อัปเดตสถานะสำเร็จ" });
 });
 
-app.delete("/api/production/:id", auth(["admin"]), (req, res) => {
+app.delete("/api/production/:id", auth(["admin","manager"]), (req, res) => {
   db.prepare("UPDATE production_orders SET status='cancelled' WHERE id=?").run(
     req.params.id,
   );
@@ -975,7 +975,7 @@ app.put(
   },
 );
 
-app.delete("/api/customers/:id", auth(["admin"]), (req, res) => {
+app.delete("/api/customers/:id", auth(["admin","manager"]), (req, res) => {
   db.prepare("UPDATE customers SET active=0 WHERE id=?").run(req.params.id);
   res.json({ message: "ลบลูกค้าสำเร็จ" });
 });
@@ -1055,11 +1055,9 @@ app.post("/api/sales", auth(), (req, res) => {
     const newTotal =
       subtotals_check.reduce((a, b) => a + b, 0) - (discount || 0);
     if (outstanding + newTotal > customer.credit_limit) {
-      return res
-        .status(400)
-        .json({
-          error: `เกินวงเงินเครดิต (วงเงิน ${customer.credit_limit.toLocaleString()} / ค้างชำระ ${outstanding.toLocaleString()})`,
-        });
+      return res.status(400).json({
+        error: `เกินวงเงินเครดิต (วงเงิน ${customer.credit_limit.toLocaleString()} / ค้างชำระ ${outstanding.toLocaleString()})`,
+      });
     }
   }
 
@@ -1079,8 +1077,8 @@ app.post("/api/sales", auth(), (req, res) => {
       });
   }
 
-  const cnt = db.prepare("SELECT COUNT(*) as c FROM sales_orders").get().c;
-  const order_number = "SO" + String(cnt + 1).padStart(5, "0");
+  const maxId = db.prepare("SELECT COALESCE(MAX(id),0) as m FROM sales_orders").get().m;
+  const order_number = "SO" + String(maxId + 1).padStart(5, "0");
   const subtotals = items.map((i) => i.quantity * i.unit_price);
   const total = subtotals.reduce((a, b) => a + b, 0) - (discount || 0);
 
@@ -1391,7 +1389,7 @@ app.get("/api/reports/production", auth(), (req, res) => {
 });
 
 // ─── Users ────────────────────────────────────────────────────────────────────
-app.get("/api/users", auth(["admin","manager"]), (req, res) => {
+app.get("/api/users", auth(["admin", "manager"]), (req, res) => {
   res.json(
     db
       .prepare(
@@ -1401,7 +1399,7 @@ app.get("/api/users", auth(["admin","manager"]), (req, res) => {
   );
 });
 
-app.post("/api/users", auth(["admin","manager"]), (req, res) => {
+app.post("/api/users", auth(["admin", "manager"]), (req, res) => {
   const { username, password, name, role } = req.body;
   if (!username || !password || !name)
     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบ" });
@@ -1421,7 +1419,7 @@ app.post("/api/users", auth(["admin","manager"]), (req, res) => {
   }
 });
 
-app.put("/api/users/:id", auth(["admin","manager"]), (req, res) => {
+app.put("/api/users/:id", auth(["admin", "manager"]), (req, res) => {
   const { name, role, active, password } = req.body;
   if (password) {
     db.prepare(
@@ -1438,7 +1436,7 @@ app.put("/api/users/:id", auth(["admin","manager"]), (req, res) => {
   res.json({ message: "แก้ไขสำเร็จ" });
 });
 
-app.delete("/api/users/:id", auth(["admin","manager"]), (req, res) => {
+app.delete("/api/users/:id", auth(["admin", "manager"]), (req, res) => {
   const u = db
     .prepare("SELECT username FROM users WHERE id=?")
     .get(req.params.id);
@@ -1738,7 +1736,7 @@ app.put("/api/qc/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขผลตรวจสำเร็จ" });
 });
 
-app.delete("/api/qc/:id", auth(["admin"]), (req, res) => {
+app.delete("/api/qc/:id", auth(["admin","manager"]), (req, res) => {
   db.prepare("DELETE FROM water_quality_tests WHERE id=?").run(req.params.id);
   res.json({ message: "ลบผลตรวจสำเร็จ" });
 });
@@ -1849,7 +1847,7 @@ app.put("/api/expenses/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขค่าใช้จ่ายสำเร็จ" });
 });
 
-app.delete("/api/expenses/:id", auth(["admin"]), (req, res) => {
+app.delete("/api/expenses/:id", auth(["admin","manager"]), (req, res) => {
   db.prepare("DELETE FROM expenses WHERE id=?").run(req.params.id);
   res.json({ message: "ลบค่าใช้จ่ายสำเร็จ" });
 });
@@ -1910,7 +1908,7 @@ app.put("/api/suppliers/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขซัพพลายเออร์สำเร็จ" });
 });
 
-app.delete("/api/suppliers/:id", auth(["admin"]), (req, res) => {
+app.delete("/api/suppliers/:id", auth(["admin","manager"]), (req, res) => {
   db.prepare("UPDATE suppliers SET active=0 WHERE id=?").run(req.params.id);
   res.json({ message: "ลบซัพพลายเออร์สำเร็จ" });
 });
@@ -1950,8 +1948,8 @@ app.post("/api/purchase-orders", auth(["admin", "manager"]), (req, res) => {
   const { supplier_id, order_date, expected_date, items, notes } = req.body;
   if (!supplier_id || !order_date || !items?.length)
     return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
-  const cnt = db.prepare("SELECT COUNT(*) as c FROM purchase_orders").get().c;
-  const po_number = "PO" + String(cnt + 1).padStart(5, "0");
+  const maxId = db.prepare("SELECT COALESCE(MAX(id),0) as m FROM purchase_orders").get().m;
+  const po_number = "PO" + String(maxId + 1).padStart(5, "0");
   const subtotals = items.map((i) => i.quantity * i.unit_price);
   const total = subtotals.reduce((a, b) => a + b, 0);
   const create = db.transaction(() => {
@@ -2075,7 +2073,7 @@ app.put("/api/equipment/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขอุปกรณ์สำเร็จ" });
 });
 
-app.delete("/api/equipment/:id", auth(["admin"]), (req, res) => {
+app.delete("/api/equipment/:id", auth(["admin","manager"]), (req, res) => {
   db.prepare("DELETE FROM equipment WHERE id=?").run(req.params.id);
   db.prepare("DELETE FROM maintenance_logs WHERE equipment_id=?").run(
     req.params.id,
@@ -2360,7 +2358,7 @@ app.put("/api/delivery-routes/:id/status", auth(), (req, res) => {
 });
 
 // ─── Audit Logs ───────────────────────────────────────────────────────────────
-app.get("/api/audit-logs", auth(["admin","manager"]), (req, res) => {
+app.get("/api/audit-logs", auth(["admin", "manager"]), (req, res) => {
   const rows = db
     .prepare("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 200")
     .all();
@@ -2375,7 +2373,7 @@ app.get("/api/settings", auth(), (req, res) => {
   res.json(settings);
 });
 
-app.put("/api/settings", auth(["admin"]), (req, res) => {
+app.put("/api/settings", auth(["admin","manager"]), (req, res) => {
   const entries = Object.entries(req.body);
   const upsert = db.prepare(
     "INSERT INTO app_settings (key,value,updated_at) VALUES (?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP",

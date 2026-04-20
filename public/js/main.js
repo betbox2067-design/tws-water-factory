@@ -248,6 +248,7 @@ const pageTitles = {
   deposits: "ถังมัดจำ",
   returns: "คืนสินค้า / ของเสีย",
   "audit-logs": "ประวัติการใช้งานระบบ",
+  "delivery-routes": "เส้นทางจัดส่ง",
 };
 
 function navigate(page) {
@@ -286,6 +287,7 @@ function navigate(page) {
     deposits: { load: loadDeposits },
     returns: { load: loadReturns },
     "audit-logs": { load: loadAuditLogs },
+    "delivery-routes": { load: loadDeliveryRoutes },
   };
   if (loaders[page]) loaders[page].load?.();
 
@@ -1924,7 +1926,7 @@ async function loadNotifications() {
       </div>`,
       )
       .join("");
-  } catch {}
+  } catch (e) { console.error(e); }
 }
 
 window.toggleNotif = () => {
@@ -1982,8 +1984,8 @@ window.doSearch = () => {
           <div class="search-item" onclick="closeSearch();navigate('customers')">
             <div class="search-item-icon"><i class="bi bi-person-fill"></i></div>
             <div class="search-item-main">
-              <div class="search-item-title">${c.name}</div>
-              <div class="search-item-sub">${c.code} · ${c.phone || "-"}</div>
+              <div class="search-item-title">${esc(c.name)}</div>
+              <div class="search-item-sub">${esc(c.code)} · ${esc(c.phone || "-")}</div>
             </div>
             <span class="badge bg-secondary search-item-badge">${custTypeLabel(c.type)}</span>
           </div>`,
@@ -1998,8 +2000,8 @@ window.doSearch = () => {
           <div class="search-item" onclick="closeSearch();navigate('products')">
             <div class="search-item-icon" style="background:#ede9fe;color:#7c3aed"><i class="bi bi-droplet-half"></i></div>
             <div class="search-item-main">
-              <div class="search-item-title">${p.name}</div>
-              <div class="search-item-sub">${p.code} · สต็อก: ${fmt.number(p.stock)} ${p.unit}</div>
+              <div class="search-item-title">${esc(p.name)}</div>
+              <div class="search-item-sub">${esc(p.code)} · สต็อก: ${fmt.number(p.stock)} ${esc(p.unit)}</div>
             </div>
             <span class="search-item-badge">${fmt.currency(p.price)}</span>
           </div>`,
@@ -2014,8 +2016,8 @@ window.doSearch = () => {
           <div class="search-item" onclick="closeSearch();navigate('sales')">
             <div class="search-item-icon" style="background:#dcfce7;color:#16a34a"><i class="bi bi-receipt"></i></div>
             <div class="search-item-main">
-              <div class="search-item-title">${o.order_number}</div>
-              <div class="search-item-sub">${o.customer_name} · ${fmt.date(o.order_date)}</div>
+              <div class="search-item-title">${esc(o.order_number)}</div>
+              <div class="search-item-sub">${esc(o.customer_name)} · ${fmt.date(o.order_date)}</div>
             </div>
             <span class="search-item-badge">${fmt.currency(o.total_amount)}</span>
           </div>`,
@@ -2023,7 +2025,7 @@ window.doSearch = () => {
           .join("");
       }
       document.getElementById("search-results").innerHTML = html;
-    } catch {}
+    } catch (e) { console.error(e); }
   }, 280);
 };
 
@@ -2164,7 +2166,7 @@ function renderKanban(data) {
             .map(
               (r) => `
           <div class="kanban-card">
-            <div class="kanban-card-title">${r.product_name}</div>
+            <div class="kanban-card-title">${esc(r.product_name)}</div>
             <div class="kanban-card-meta">สั่งผลิต: ${fmt.number(r.quantity_planned)} หน่วย<br>${fmt.date(r.created_at)}</div>
             ${col.key === "pending" ? `<button class="btn btn-xs btn-outline-primary btn-sm w-100" onclick="changeProductionStatus(${r.id},'in_progress')">เริ่มผลิต</button>` : ""}
             ${col.key === "in_progress" ? `<button class="btn btn-xs btn-outline-success btn-sm w-100" onclick="changeProductionStatus(${r.id},'completed')">เสร็จแล้ว</button>` : ""}
@@ -2241,7 +2243,7 @@ async function loadDashActivity() {
         )
         .join("") +
       "</div>";
-  } catch {}
+  } catch (e) { console.error(e); }
 }
 
 async function loadDashAlerts() {
@@ -2263,7 +2265,7 @@ async function loadDashAlerts() {
         )
         .join("") +
       "</div>";
-  } catch {}
+  } catch (e) { console.error(e); }
 }
 
 // Hook dashboard.load to also load activity
@@ -2286,8 +2288,19 @@ fmt.timeAgo = (dt) => {
 };
 
 // ─── SETTINGS PAGE ───────────────────────────────────────────────────────────
-function loadSettingsPage() {
-  const co = JSON.parse(localStorage.getItem("tws_company") || "{}");
+async function loadSettingsPage() {
+  let co = JSON.parse(localStorage.getItem("tws_company") || "{}");
+  try {
+    const dbSettings = await api.get("/api/settings");
+    if (dbSettings) {
+      co = {
+        name: dbSettings.company_name || co.name || "",
+        address: dbSettings.company_address || co.address || "",
+        phone: dbSettings.company_phone || co.phone || "",
+        tax: dbSettings.company_tax || co.tax || "",
+      };
+    }
+  } catch (e) { console.error(e); }
   document.getElementById("set-company").value = co.name || "";
   document.getElementById("set-address").value = co.address || "";
   document.getElementById("set-phone").value = co.phone || "";
@@ -2308,15 +2321,24 @@ function loadSettingsPage() {
   });
 }
 
-window.saveCompanySettings = () => {
-  const co = {
-    name: document.getElementById("set-company").value.trim(),
-    address: document.getElementById("set-address").value.trim(),
-    phone: document.getElementById("set-phone").value.trim(),
-    tax: document.getElementById("set-tax").value.trim(),
+window.saveCompanySettings = async () => {
+  const data = {
+    company_name: document.getElementById("set-company").value.trim(),
+    company_address: document.getElementById("set-address").value.trim(),
+    company_phone: document.getElementById("set-phone").value.trim(),
+    company_tax: document.getElementById("set-tax").value.trim(),
   };
-  localStorage.setItem("tws_company", JSON.stringify(co));
-  toast("บันทึกข้อมูลบริษัทสำเร็จ");
+  try {
+    await api.put("/api/settings", data);
+    localStorage.setItem("tws_company", JSON.stringify({
+      name: data.company_name, address: data.company_address,
+      phone: data.company_phone, tax: data.company_tax,
+    }));
+    toast("บันทึกข้อมูลบริษัทสำเร็จ");
+  } catch (e) {
+    console.error(e);
+    toast(e.message, "danger");
+  }
 };
 
 window.changePassword = async () => {
@@ -2394,7 +2416,7 @@ window.showQcModal = async (id) => {
             `<option value="${p.id}" data-batch="${p.batch_number}">${p.batch_number} - ${p.product_name}</option>`,
         )
         .join("");
-  } catch {}
+  } catch (e) { console.error(e); }
   if (id) {
     try {
       const data = await api.get("/api/qc");
@@ -2415,7 +2437,7 @@ window.showQcModal = async (id) => {
         document.getElementById("qc-result").value = r.result || "pending";
         document.getElementById("qc-notes").value = r.notes || "";
       }
-    } catch {}
+    } catch (e) { console.error(e); }
   }
   new bootstrap.Modal("#qcModal").show();
 };
@@ -2508,7 +2530,7 @@ window.showSupplierModal = async (id) => {
         document.getElementById("sup-address").value = s.address || "";
         document.getElementById("sup-notes").value = s.notes || "";
       }
-    } catch {}
+    } catch (e) { console.error(e); }
   }
   new bootstrap.Modal("#supplierModal").show();
 };
@@ -2549,7 +2571,7 @@ window.deleteSupplier = async (id) => {
   }
 };
 
-// ─── PURCHASE ORDERS ──────────────────────────────────────────────────────
+// ─── PURCHASE ORDERS ──────���───────────────────────────────────────────────
 async function loadPurchaseOrders() {
   try {
     const data = await api.get("/api/purchase-orders");
@@ -2637,11 +2659,11 @@ window.showPOModal = async () => {
     document.getElementById("po-supplier").innerHTML =
       '<option value="">-- เลือก --</option>' +
       sups.map((s) => `<option value="${s.id}">${s.name}</option>`).join("");
-  } catch {}
+  } catch (e) { console.error(e); }
   // Load materials
   try {
     allMaterials = await api.get("/api/materials");
-  } catch {}
+  } catch (e) { console.error(e); }
   addPOItem();
   new bootstrap.Modal("#poModal").show();
 };
@@ -2780,7 +2802,7 @@ window.showExpenseModal = async (id) => {
         document.getElementById("exp-desc").value = e.description || "";
         document.getElementById("exp-ref").value = e.receipt_ref || "";
       }
-    } catch {}
+    } catch (e) { console.error(e); }
   }
   new bootstrap.Modal("#expenseModal").show();
 };
@@ -2882,7 +2904,7 @@ window.showEquipmentModal = async (id) => {
         document.getElementById("eq-status").value = e.status || "active";
         document.getElementById("eq-notes").value = e.notes || "";
       }
-    } catch {}
+    } catch (e) { console.error(e); }
   }
   new bootstrap.Modal("#equipmentModal").show();
 };
@@ -2934,7 +2956,7 @@ window.showMaintenanceModal = async () => {
       eqData
         .map((e) => `<option value="${e.id}">${e.name} (${e.code})</option>`)
         .join("");
-  } catch {}
+  } catch (e) { console.error(e); }
   new bootstrap.Modal("#maintenanceModal").show();
 };
 
@@ -3008,7 +3030,7 @@ window.showDepositModal = async () => {
     document.getElementById("dep-customer").innerHTML =
       '<option value="">-- เลือกลูกค้า --</option>' +
       custs.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
-  } catch {}
+  } catch (e) { console.error(e); }
   new bootstrap.Modal("#depositModal").show();
 };
 
@@ -3094,7 +3116,7 @@ window.showReturnModal = async () => {
             `<option value="${s.id}">#${s.id} - ${s.customer_name || "-"}</option>`,
         )
         .join("");
-  } catch {}
+  } catch (e) { console.error(e); }
   new bootstrap.Modal("#returnModal").show();
 };
 
@@ -3171,6 +3193,89 @@ async function loadAuditLogs() {
     toast(err.message, "danger");
   }
 }
+
+// ─── DELIVERY ROUTES (เส้นทางจัดส่ง) ─────────────────────────────────────────
+async function loadDeliveryRoutes() {
+  try {
+    const data = await api.get("/api/delivery-routes");
+    const tbody = document.getElementById("delivery-routes-tbody");
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">ยังไม่มีเส้นทางจัดส่ง</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map(r => {
+      const st = r.status || "pending";
+      const stCls = { pending: "warning", in_progress: "primary", completed: "success", cancelled: "secondary" }[st] || "secondary";
+      const stLabel = { pending: "รอจัดส่ง", in_progress: "กำลังจัดส่ง", completed: "จัดส่งแล้ว", cancelled: "ยกเลิก" }[st] || st;
+      return `<tr>
+        <td>${esc(r.route_name)}</td>
+        <td>${esc(r.driver_name || "-")}</td>
+        <td>${esc(r.vehicle_number || "-")}</td>
+        <td>${fmt.date(r.delivery_date)}</td>
+        <td class="text-center">${r.order_count || 0}</td>
+        <td><span class="badge bg-${stCls}">${stLabel}</span></td>
+        <td>
+          ${st === "pending" ? `<button class="btn btn-sm btn-outline-primary" onclick="updateRouteStatus(${r.id},'in_progress')"><i class="bi bi-play-fill"></i></button>` : ""}
+          ${st === "in_progress" ? `<button class="btn btn-sm btn-outline-success" onclick="updateRouteStatus(${r.id},'completed')"><i class="bi bi-check-lg"></i></button>` : ""}
+        </td>
+      </tr>`;
+    }).join("");
+  } catch (e) {
+    console.error(e);
+    toast("โหลดเส้นทางจัดส่งผิดพลาด", "danger");
+  }
+}
+
+window.showDeliveryRouteModal = async (id) => {
+  const modal = new bootstrap.Modal(document.getElementById("deliveryRouteModal"));
+  document.getElementById("dr-name").value = "";
+  document.getElementById("dr-driver").value = "";
+  document.getElementById("dr-vehicle").value = "";
+  document.getElementById("dr-date").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("dr-notes").value = "";
+  // Load pending sales orders for selection
+  try {
+    const orders = await api.get("/api/sales");
+    const sel = document.getElementById("dr-orders");
+    sel.innerHTML = orders
+      .filter(o => o.status === "confirmed" || o.status === "pending")
+      .map(o => `<option value="${o.id}">${esc(o.order_number)} - ${esc(o.customer_name)} (${fmt.currency(o.total_amount)})</option>`)
+      .join("");
+  } catch (e) { console.error(e); }
+  modal.show();
+};
+
+window.saveDeliveryRoute = async () => {
+  const data = {
+    route_name: document.getElementById("dr-name").value.trim(),
+    driver_name: document.getElementById("dr-driver").value.trim(),
+    vehicle_number: document.getElementById("dr-vehicle").value.trim(),
+    delivery_date: document.getElementById("dr-date").value,
+    notes: document.getElementById("dr-notes").value.trim(),
+    order_ids: Array.from(document.getElementById("dr-orders").selectedOptions).map(o => Number(o.value)),
+  };
+  if (!data.route_name || !data.delivery_date) return toast("กรุณากรอกข้อมูลให้ครบ", "warning");
+  try {
+    await api.post("/api/delivery-routes", data);
+    bootstrap.Modal.getInstance(document.getElementById("deliveryRouteModal")).hide();
+    toast("สร้างเส้นทางจัดส่งสำเร็จ");
+    loadDeliveryRoutes();
+  } catch (e) {
+    console.error(e);
+    toast(e.message, "danger");
+  }
+};
+
+window.updateRouteStatus = async (id, status) => {
+  try {
+    await api.put("/api/delivery-routes/" + id + "/status", { status });
+    toast("อัปเดตสถานะสำเร็จ");
+    loadDeliveryRoutes();
+  } catch (e) {
+    console.error(e);
+    toast(e.message, "danger");
+  }
+};
 
 // ─── QUICK ACTION HELPERS ─────────────────────────────────────────────────────
 window.showSaleModal =
