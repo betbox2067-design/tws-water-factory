@@ -744,7 +744,7 @@ app.put("/api/materials/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขสำเร็จ" });
 });
 
-app.delete("/api/materials/:id", auth(["admin","manager"]), (req, res) => {
+app.delete("/api/materials/:id", auth(["admin", "manager"]), (req, res) => {
   db.prepare("DELETE FROM raw_materials WHERE id=?").run(req.params.id);
   res.json({ message: "ลบสำเร็จ" });
 });
@@ -822,7 +822,7 @@ app.put("/api/products/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขสำเร็จ" });
 });
 
-app.delete("/api/products/:id", auth(["admin","manager"]), (req, res) => {
+app.delete("/api/products/:id", auth(["admin", "manager"]), (req, res) => {
   db.prepare("UPDATE products SET active=0 WHERE id=?").run(req.params.id);
   res.json({ message: "ลบสินค้าสำเร็จ" });
 });
@@ -933,7 +933,7 @@ app.put("/api/production/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "อัปเดตสถานะสำเร็จ" });
 });
 
-app.delete("/api/production/:id", auth(["admin","manager"]), (req, res) => {
+app.delete("/api/production/:id", auth(["admin", "manager"]), (req, res) => {
   db.prepare("UPDATE production_orders SET status='cancelled' WHERE id=?").run(
     req.params.id,
   );
@@ -975,7 +975,7 @@ app.put(
   },
 );
 
-app.delete("/api/customers/:id", auth(["admin","manager"]), (req, res) => {
+app.delete("/api/customers/:id", auth(["admin", "manager"]), (req, res) => {
   db.prepare("UPDATE customers SET active=0 WHERE id=?").run(req.params.id);
   res.json({ message: "ลบลูกค้าสำเร็จ" });
 });
@@ -1077,7 +1077,9 @@ app.post("/api/sales", auth(), (req, res) => {
       });
   }
 
-  const maxId = db.prepare("SELECT COALESCE(MAX(id),0) as m FROM sales_orders").get().m;
+  const maxId = db
+    .prepare("SELECT COALESCE(MAX(id),0) as m FROM sales_orders")
+    .get().m;
   const order_number = "SO" + String(maxId + 1).padStart(5, "0");
   const subtotals = items.map((i) => i.quantity * i.unit_price);
   const total = subtotals.reduce((a, b) => a + b, 0) - (discount || 0);
@@ -1736,7 +1738,7 @@ app.put("/api/qc/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขผลตรวจสำเร็จ" });
 });
 
-app.delete("/api/qc/:id", auth(["admin","manager"]), (req, res) => {
+app.delete("/api/qc/:id", auth(["admin", "manager"]), (req, res) => {
   db.prepare("DELETE FROM water_quality_tests WHERE id=?").run(req.params.id);
   res.json({ message: "ลบผลตรวจสำเร็จ" });
 });
@@ -1847,7 +1849,7 @@ app.put("/api/expenses/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขค่าใช้จ่ายสำเร็จ" });
 });
 
-app.delete("/api/expenses/:id", auth(["admin","manager"]), (req, res) => {
+app.delete("/api/expenses/:id", auth(["admin", "manager"]), (req, res) => {
   db.prepare("DELETE FROM expenses WHERE id=?").run(req.params.id);
   res.json({ message: "ลบค่าใช้จ่ายสำเร็จ" });
 });
@@ -1908,7 +1910,7 @@ app.put("/api/suppliers/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขซัพพลายเออร์สำเร็จ" });
 });
 
-app.delete("/api/suppliers/:id", auth(["admin","manager"]), (req, res) => {
+app.delete("/api/suppliers/:id", auth(["admin", "manager"]), (req, res) => {
   db.prepare("UPDATE suppliers SET active=0 WHERE id=?").run(req.params.id);
   res.json({ message: "ลบซัพพลายเออร์สำเร็จ" });
 });
@@ -1948,7 +1950,9 @@ app.post("/api/purchase-orders", auth(["admin", "manager"]), (req, res) => {
   const { supplier_id, order_date, expected_date, items, notes } = req.body;
   if (!supplier_id || !order_date || !items?.length)
     return res.status(400).json({ error: "ข้อมูลไม่ครบ" });
-  const maxId = db.prepare("SELECT COALESCE(MAX(id),0) as m FROM purchase_orders").get().m;
+  const maxId = db
+    .prepare("SELECT COALESCE(MAX(id),0) as m FROM purchase_orders")
+    .get().m;
   const po_number = "PO" + String(maxId + 1).padStart(5, "0");
   const subtotals = items.map((i) => i.quantity * i.unit_price);
   const total = subtotals.reduce((a, b) => a + b, 0);
@@ -2073,7 +2077,7 @@ app.put("/api/equipment/:id", auth(["admin", "manager"]), (req, res) => {
   res.json({ message: "แก้ไขอุปกรณ์สำเร็จ" });
 });
 
-app.delete("/api/equipment/:id", auth(["admin","manager"]), (req, res) => {
+app.delete("/api/equipment/:id", auth(["admin", "manager"]), (req, res) => {
   db.prepare("DELETE FROM equipment WHERE id=?").run(req.params.id);
   db.prepare("DELETE FROM maintenance_logs WHERE equipment_id=?").run(
     req.params.id,
@@ -2373,7 +2377,7 @@ app.get("/api/settings", auth(), (req, res) => {
   res.json(settings);
 });
 
-app.put("/api/settings", auth(["admin","manager"]), (req, res) => {
+app.put("/api/settings", auth(["admin", "manager"]), (req, res) => {
   const entries = Object.entries(req.body);
   const upsert = db.prepare(
     "INSERT INTO app_settings (key,value,updated_at) VALUES (?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP",

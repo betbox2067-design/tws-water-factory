@@ -75,8 +75,8 @@ const fmt = {
 
 // ─── XSS Escape ──────────────────────────────────────────
 function esc(s) {
-  if (s == null) return '';
-  const d = document.createElement('div');
+  if (s == null) return "";
+  const d = document.createElement("div");
   d.textContent = String(s);
   return d.innerHTML;
 }
@@ -472,8 +472,8 @@ const dashboard = {
       .map(
         (r) => `
       <tr>
-        <td><a href="#" class="text-primary fw-semibold" onclick="showSaleDetail(${r.id || 0})">${r.order_number}</a></td>
-        <td>${r.customer_name}</td>
+        <td><a href="#" class="text-primary fw-semibold" onclick="showSaleDetail(${r.id || 0})">${esc(r.order_number)}</a></td>
+        <td>${esc(r.customer_name)}</td>
         <td>${fmt.date(r.order_date)}</td>
         <td class="text-end">${fmt.currency(r.total_amount)}</td>
         <td>${statusBadge(r.status)}</td>
@@ -548,11 +548,11 @@ const materials = {
           <div class="mat-card-badge">${statusText}</div>
         </div>
         <div class="mat-card-body">
-          <div class="mat-card-code">${m.code}</div>
-          <div class="mat-card-name" title="${m.name}">${m.name}</div>
+          <div class="mat-card-code">${esc(m.code)}</div>
+          <div class="mat-card-name" title="${esc(m.name)}">${esc(m.name)}</div>
           <div class="mat-stock-row">
             <span class="mat-stock-label">คงเหลือ</span>
-            <span class="mat-stock-value">${fmt.number(m.quantity)} ${m.unit}</span>
+            <span class="mat-stock-value">${fmt.number(m.quantity)} ${esc(m.unit)}</span>
           </div>
           <div class="mat-stock-bar"><div class="mat-stock-fill" style="width:${pct}%"></div></div>
           <div class="mat-card-info">
@@ -562,7 +562,7 @@ const materials = {
             </div>
             <div class="mat-info-item">
               <span class="mat-info-label">หน่วย</span>
-              <span class="mat-info-value">${m.unit}</span>
+              <span class="mat-info-value">${esc(m.unit)}</span>
             </div>
             <div class="mat-info-item">
               <span class="mat-info-label">ราคา/หน่วย</span>
@@ -572,7 +572,7 @@ const materials = {
         </div>
         <div class="mat-card-actions">
           <button class="btn btn-outline-success btn-sm" title="รับเข้า/เบิกออก" onclick="showAdjustModal(${m.id})"><i class="bi bi-arrow-down-up me-1"></i>ปรับสต็อก</button>
-          <button class="btn btn-outline-secondary btn-sm" title="ประวัติ" onclick="showLogsModal(${m.id},'${m.name}')"><i class="bi bi-clock-history me-1"></i>ประวัติ</button>
+          <button class="btn btn-outline-secondary btn-sm" title="ประวัติ" onclick="showLogsModal(${m.id})"><i class="bi bi-clock-history me-1"></i>ประวัติ</button>
           ${canEdit ? `<button class="btn btn-outline-primary btn-sm" onclick="showMaterialModal(${m.id})"><i class="bi bi-pencil me-1"></i>แก้ไข</button>` : ""}
           ${canEdit ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteMaterial(${m.id})"><i class="bi bi-trash me-1"></i>ลบ</button>` : ""}
         </div>
@@ -695,8 +695,9 @@ window.saveAdjust = async () => {
   }
 };
 
-window.showLogsModal = async (id, name) => {
-  document.getElementById("logs-title").textContent = `ประวัติ: ${name}`;
+window.showLogsModal = async (id) => {
+  const mat = allMaterials.find(x => x.id === id);
+  document.getElementById("logs-title").textContent = `ประวัติ: ${mat?.name || ''}`;
   const tbody = document.getElementById("logs-tbody");
   tbody.innerHTML =
     '<tr><td colspan="5" class="text-center"><span class="spinner-border spinner-border-sm"></span></td></tr>';
@@ -714,8 +715,8 @@ window.showLogsModal = async (id, name) => {
       <td>${fmt.date(l.created_at)}</td>
       <td>${l.type === "in" ? '<span class="text-success fw-semibold">รับเข้า</span>' : '<span class="text-danger fw-semibold">เบิกออก</span>'}</td>
       <td class="text-end">${fmt.number(l.quantity)}</td>
-      <td>${l.note || "-"}</td>
-      <td>${l.created_by_name || "-"}</td>
+      <td>${esc(l.note) || "-"}</td>
+      <td>${esc(l.created_by_name) || "-"}</td>
     </tr>`,
       )
       .join("");
@@ -792,8 +793,8 @@ const products = {
           <div class="prod-card-size">${sizeLabel(p.size_ml)}</div>
         </div>
         <div class="prod-card-body">
-          <div class="prod-card-code">${p.code}</div>
-          <div class="prod-card-name" title="${p.name}">${p.name}</div>
+          <div class="prod-card-code">${esc(p.code)}</div>
+          <div class="prod-card-name" title="${esc(p.name)}">${esc(p.name)}</div>
           <div class="prod-price-row">
             <div class="prod-price-item">
               <span class="prod-price-label">ราคาขาย</span>
@@ -810,7 +811,7 @@ const products = {
           </div>
           <div class="prod-stock-row">
             <span class="prod-stock-label">คงเหลือ</span>
-            <span class="prod-stock-value">${fmt.number(p.stock)} ${p.unit}</span>
+            <span class="prod-stock-value">${fmt.number(p.stock)} ${esc(p.unit)}</span>
           </div>
           <div class="prod-stock-bar"><div class="prod-stock-fill" style="width:${pct}%"></div></div>
           <div class="prod-card-info">
@@ -820,7 +821,7 @@ const products = {
             </div>
             <div class="prod-info-item">
               <span class="prod-info-label">หน่วย</span>
-              <span class="prod-info-value">${p.unit}</span>
+              <span class="prod-info-value">${esc(p.unit)}</span>
             </div>
           </div>
         </div>
@@ -949,17 +950,17 @@ const production = {
         (r) => `
       <tr>
         <td>${r.id}</td>
-        <td class="fw-semibold">${r.product_name}</td>
-        <td class="text-end">${fmt.number(r.quantity_planned)} ${r.unit}</td>
+        <td class="fw-semibold">${esc(r.product_name)}</td>
+        <td class="text-end">${fmt.number(r.quantity_planned)} ${esc(r.unit)}</td>
         <td class="text-end">${r.quantity_produced > 0 ? fmt.number(r.quantity_produced) : "-"}</td>
         <td>${statusBadge(r.status)}</td>
-        <td>${r.created_by_name || "-"}</td>
+        <td>${esc(r.created_by_name) || "-"}</td>
         <td>${fmt.date(r.created_at)}</td>
         <td>
           ${
             !["completed", "cancelled"].includes(r.status) && canManage
               ? `
-          <button class="btn btn-outline-primary btn-sm" onclick="showProductionStatus(${r.id},'${r.product_name}',${r.quantity_planned},'${r.status}')">
+          <button class="btn btn-outline-primary btn-sm" onclick="showProductionStatus(${r.id})">
             <i class="bi bi-arrow-right-circle"></i> สถานะ
           </button>`
               : ""
@@ -978,7 +979,7 @@ window.showProductionModal = async () => {
   sel.innerHTML = '<option value="">-- เลือกสินค้า --</option>';
   if (!allProducts.length) await products.load();
   allProducts.forEach((p) => {
-    sel.innerHTML += `<option value="${p.id}">${p.code} - ${p.name}</option>`;
+    sel.innerHTML += `<option value="${p.id}">${esc(p.code)} - ${esc(p.name)}</option>`;
   });
   document.getElementById("prd-qty").value = "";
   document.getElementById("prd-notes").value = "";
@@ -1006,14 +1007,16 @@ window.saveProduction = async () => {
   }
 };
 
-window.showProductionStatus = (id, name, qty, currentStatus) => {
+window.showProductionStatus = (id) => {
+  const r = production.data.find(x => x.id === id);
+  if (!r) return;
   document.getElementById("ps-id").value = id;
-  document.getElementById("ps-name").textContent = name;
-  document.getElementById("ps-qty").value = qty;
+  document.getElementById("ps-name").textContent = r.product_name;
+  document.getElementById("ps-qty").value = r.quantity_planned;
   const sel = document.getElementById("ps-status");
   // filter options
   const options =
-    currentStatus === "pending"
+    r.status === "pending"
       ? ["in_progress", "cancelled"]
       : ["completed", "cancelled"];
   sel.innerHTML = options
@@ -1077,12 +1080,12 @@ const customers = {
       .map(
         (c) => `
       <tr>
-        <td><code>${c.code}</code></td>
-        <td class="fw-semibold">${c.name}</td>
-        <td>${c.phone || "-"}</td>
+        <td><code>${esc(c.code)}</code></td>
+        <td class="fw-semibold">${esc(c.name)}</td>
+        <td>${esc(c.phone) || "-"}</td>
         <td><span class="badge-status status-confirmed">${custTypeLabel(c.type)}</span></td>
         <td class="text-end">${fmt.currency(c.credit_limit)}</td>
-        <td class="text-muted small" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.address || "-"}</td>
+        <td class="text-muted small" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.address) || "-"}</td>
         <td>
           <div class="d-flex gap-1">
             <button class="btn btn-outline-primary btn-sm" onclick="showCustomerModal(${c.id})"><i class="bi bi-pencil"></i></button>
@@ -1194,8 +1197,8 @@ const sales = {
       .map(
         (r) => `
       <tr>
-        <td><a href="#" class="text-primary fw-semibold" onclick="showSaleDetail(${r.id})">${r.order_number}</a></td>
-        <td>${r.customer_name}</td>
+        <td><a href="#" class="text-primary fw-semibold" onclick="showSaleDetail(${r.id})">${esc(r.order_number)}</a></td>
+        <td>${esc(r.customer_name)}</td>
         <td>${fmt.date(r.order_date)}</td>
         <td class="text-end">${fmt.currency(r.total_amount)}</td>
         <td class="text-end text-success">${fmt.currency(r.paid_amount)}</td>
@@ -1225,7 +1228,7 @@ window.showSaleModal = async () => {
   const custSel = document.getElementById("sale-customer");
   custSel.innerHTML = '<option value="">-- เลือกลูกค้า --</option>';
   allCustomers.forEach((c) => {
-    custSel.innerHTML += `<option value="${c.id}">${c.code} - ${c.name}</option>`;
+    custSel.innerHTML += `<option value="${c.id}">${esc(c.code)} - ${esc(c.name)}</option>`;
   });
 
   document.getElementById("sale-date").value = fmt.today();
@@ -1254,7 +1257,7 @@ window.addSaleItem = () => {
     <td>
       <select class="form-select form-select-sm" id="si-prod-${idx}" onchange="fillSalePrice(${idx})">
         <option value="">-- เลือกสินค้า --</option>
-        ${allProducts.map((p) => `<option value="${p.id}" data-price="${p.price}">${p.code} - ${p.name} (฿${p.price})</option>`).join("")}
+        ${allProducts.map((p) => `<option value="${p.id}" data-price="${p.price}">${esc(p.code)} - ${esc(p.name)} (฿${p.price})</option>`).join("")}
       </select>
     </td>
     <td><input type="number" class="form-control form-control-sm" id="si-qty-${idx}" min="1" value="1" oninput="calcSaleRowTotal(${idx})"></td>
@@ -1359,7 +1362,7 @@ window.showSaleDetail = async (id) => {
     const itemsHtml = d.items
       .map(
         (i) => `
-      <tr><td>${i.product_name}</td><td class="text-end">${fmt.number(i.quantity)} ${i.unit}</td>
+      <tr><td>${esc(i.product_name)}</td><td class="text-end">${fmt.number(i.quantity)} ${esc(i.unit)}</td>
       <td class="text-end">${fmt.currency(i.unit_price)}</td><td class="text-end">${fmt.currency(i.subtotal)}</td></tr>
     `,
       )
@@ -1380,7 +1383,7 @@ window.showSaleDetail = async (id) => {
       ? `
       <div class="mt-3 p-3 bg-light rounded">
         <strong><i class="bi bi-truck me-1"></i>การจัดส่ง</strong><br>
-        คนขับ: ${d.delivery.driver_name || "-"} | ทะเบียน: ${d.delivery.vehicle_number || "-"} | 
+        คนขับ: ${esc(d.delivery.driver_name) || "-"} | ทะเบียน: ${esc(d.delivery.vehicle_number) || "-"} | 
         วันจัดส่ง: ${fmt.date(d.delivery.delivery_date)} | สถานะ: ${statusBadge(d.delivery.status)}
       </div>`
       : "";
@@ -1388,9 +1391,9 @@ window.showSaleDetail = async (id) => {
     document.getElementById("sale-detail-body").innerHTML = `
       <div class="row g-3 mb-3">
         <div class="col-md-6">
-          <p class="mb-1"><strong>ลูกค้า:</strong> ${d.customer_name}</p>
-          <p class="mb-1"><strong>โทร:</strong> ${d.customer_phone || "-"}</p>
-          <p class="mb-1"><strong>ที่อยู่:</strong> ${d.customer_address || "-"}</p>
+          <p class="mb-1"><strong>ลูกค้า:</strong> ${esc(d.customer_name)}</p>
+          <p class="mb-1"><strong>โทร:</strong> ${esc(d.customer_phone) || "-"}</p>
+          <p class="mb-1"><strong>ที่อยู่:</strong> ${esc(d.customer_address) || "-"}</p>
         </div>
         <div class="col-md-6">
           <p class="mb-1"><strong>วันที่:</strong> ${fmt.date(d.order_date)}</p>
@@ -1419,7 +1422,7 @@ window.showSaleDetail = async (id) => {
         </table>
       </div>
       ${delivery}
-      ${d.notes ? `<p class="mt-2 text-muted small"><strong>หมายเหตุ:</strong> ${d.notes}</p>` : ""}
+      ${d.notes ? `<p class="mt-2 text-muted small"><strong>หมายเหตุ:</strong> ${esc(d.notes)}</p>` : ""}
     `;
   } catch (err) {
     document.getElementById("sale-detail-body").innerHTML =
@@ -1532,18 +1535,18 @@ const delivery = {
       .map(
         (d) => `
       <tr>
-        <td><span class="fw-semibold">${d.order_number}</span></td>
-        <td>${d.customer_name}</td>
-        <td class="text-muted small" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.address || "-"}</td>
-        <td>${d.driver_name || "-"}</td>
-        <td>${d.vehicle_number || "-"}</td>
+        <td><span class="fw-semibold">${esc(d.order_number)}</span></td>
+        <td>${esc(d.customer_name)}</td>
+        <td class="text-muted small" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.address) || "-"}</td>
+        <td>${esc(d.driver_name) || "-"}</td>
+        <td>${esc(d.vehicle_number) || "-"}</td>
         <td>${d.delivery_date ? fmt.date(d.delivery_date) : "-"}</td>
         <td>${statusBadge(d.status)}</td>
         <td>
           ${
             !["delivered", "failed"].includes(d.status)
               ? `
-          <button class="btn btn-outline-primary btn-sm" onclick="showDeliveryUpdateModal(${d.id},'${d.status || "pending"}','${d.driver_name || ""}','${d.vehicle_number || ""}','${d.delivery_date || ""}','${(d.notes || "").replace(/'/g, "&apos;")}')">
+          <button class="btn btn-outline-primary btn-sm" data-did="${d.id}" data-status="${esc(d.status || 'pending')}" data-driver="${esc(d.driver_name || '')}" data-vehicle="${esc(d.vehicle_number || '')}" data-date="${esc(d.delivery_date || '')}" data-notes="${esc(d.notes || '')}" onclick="showDeliveryUpdateModal(this)">
             <i class="bi bi-pencil"></i>
           </button>`
               : ""
@@ -1568,7 +1571,7 @@ window.showDeliveryModal = async () => {
   const sel = document.getElementById("del-order");
   sel.innerHTML = '<option value="">-- เลือกใบสั่งซื้อ --</option>';
   available.forEach((o) => {
-    sel.innerHTML += `<option value="${o.id}">${o.order_number} - ${o.customer_name} (${fmt.currency(o.total_amount)})</option>`;
+    sel.innerHTML += `<option value="${o.id}">${esc(o.order_number)} - ${esc(o.customer_name)} (${fmt.currency(o.total_amount)})</option>`;
   });
 
   document.getElementById("del-driver").value = "";
@@ -1599,13 +1602,13 @@ window.saveDelivery = async () => {
   }
 };
 
-window.showDeliveryUpdateModal = (id, status, driver, vehicle, date, notes) => {
-  document.getElementById("dup-id").value = id;
-  document.getElementById("dup-status").value = status;
-  document.getElementById("dup-driver").value = driver;
-  document.getElementById("dup-vehicle").value = vehicle;
-  document.getElementById("dup-date").value = date;
-  document.getElementById("dup-notes").value = notes;
+window.showDeliveryUpdateModal = (el) => {
+  document.getElementById("dup-id").value = el.dataset.did;
+  document.getElementById("dup-status").value = el.dataset.status;
+  document.getElementById("dup-driver").value = el.dataset.driver;
+  document.getElementById("dup-vehicle").value = el.dataset.vehicle;
+  document.getElementById("dup-date").value = el.dataset.date;
+  document.getElementById("dup-notes").value = el.dataset.notes;
   new bootstrap.Modal("#deliveryUpdateModal").show();
 };
 
@@ -1725,7 +1728,7 @@ const reports = {
         d.byProduct
           .map(
             (r) =>
-              `<tr><td>${r.name}</td><td class="text-end">${fmt.number(r.quantity)}</td><td class="text-end">${fmt.currency(r.revenue)}</td></tr>`,
+              `<tr><td>${esc(r.name)}</td><td class="text-end">${fmt.number(r.quantity)}</td><td class="text-end">${fmt.currency(r.revenue)}</td></tr>`,
           )
           .join("") ||
         '<tr><td colspan="3" class="text-center text-muted">ไม่มีข้อมูล</td></tr>';
@@ -1734,7 +1737,7 @@ const reports = {
         d.byCustomer
           .map(
             (r) =>
-              `<tr><td>${r.name}</td><td class="text-end">${r.orders}</td><td class="text-end">${fmt.currency(r.revenue)}</td></tr>`,
+              `<tr><td>${esc(r.name)}</td><td class="text-end">${r.orders}</td><td class="text-end">${fmt.currency(r.revenue)}</td></tr>`,
           )
           .join("") ||
         '<tr><td colspan="3" class="text-center text-muted">ไม่มีข้อมูล</td></tr>';
@@ -1762,7 +1765,7 @@ const reports = {
           .filter((p) => p.stock <= p.min_stock)
           .map(
             (p) =>
-              `<tr><td>${p.name}</td><td class="text-end ${p.stock === 0 ? "text-danger fw-bold" : "text-warning fw-semibold"}">${fmt.number(p.stock)}</td><td class="text-end text-muted">${fmt.number(p.min_stock)}</td></tr>`,
+              `<tr><td>${esc(p.name)}</td><td class="text-end ${p.stock === 0 ? "text-danger fw-bold" : "text-warning fw-semibold"}">${fmt.number(p.stock)}</td><td class="text-end text-muted">${fmt.number(p.min_stock)}</td></tr>`,
           )
           .join("") ||
         '<tr><td colspan="3" class="text-center text-success"><i class="bi bi-check-circle me-1"></i>สต็อกปกติทุกรายการ</td></tr>';
@@ -1772,7 +1775,7 @@ const reports = {
           .filter((m) => m.quantity <= m.min_quantity)
           .map(
             (m) =>
-              `<tr><td>${m.name}</td><td class="text-end ${m.quantity === 0 ? "text-danger fw-bold" : "text-warning fw-semibold"}">${fmt.number(m.quantity)}</td><td class="text-end text-muted">${fmt.number(m.min_quantity)}</td></tr>`,
+              `<tr><td>${esc(m.name)}</td><td class="text-end ${m.quantity === 0 ? "text-danger fw-bold" : "text-warning fw-semibold"}">${fmt.number(m.quantity)}</td><td class="text-end text-muted">${fmt.number(m.min_quantity)}</td></tr>`,
           )
           .join("") ||
         '<tr><td colspan="3" class="text-center text-success"><i class="bi bi-check-circle me-1"></i>วัตถุดิบปกติทุกรายการ</td></tr>';
@@ -1780,7 +1783,7 @@ const reports = {
       document.getElementById("inv-products-tbody").innerHTML = d.products
         .map(
           (p) =>
-            `<tr><td><code>${p.code}</code></td><td>${p.name}</td><td class="text-end">${fmt.number(p.stock)} ${p.unit}</td><td class="text-end">${fmt.currency(p.cost)}</td><td class="text-end fw-semibold">${fmt.currency(p.stock * p.cost)}</td></tr>`,
+            `<tr><td><code>${esc(p.code)}</code></td><td>${esc(p.name)}</td><td class="text-end">${fmt.number(p.stock)} ${esc(p.unit)}</td><td class="text-end">${fmt.currency(p.cost)}</td><td class="text-end fw-semibold">${fmt.currency(p.stock * p.cost)}</td></tr>`,
         )
         .join("");
     } catch (err) {
@@ -1810,7 +1813,7 @@ const reports = {
         d.orders
           .map(
             (r) =>
-              `<tr><td>${r.id}</td><td>${r.product_name}</td><td class="text-end">${fmt.number(r.quantity_planned)}</td><td class="text-end">${r.quantity_produced > 0 ? fmt.number(r.quantity_produced) : "-"}</td><td>${statusBadge(r.status)}</td><td>${fmt.date(r.created_at)}</td></tr>`,
+              `<tr><td>${r.id}</td><td>${esc(r.product_name)}</td><td class="text-end">${fmt.number(r.quantity_planned)}</td><td class="text-end">${r.quantity_produced > 0 ? fmt.number(r.quantity_produced) : "-"}</td><td>${statusBadge(r.status)}</td><td>${fmt.date(r.created_at)}</td></tr>`,
           )
           .join("") ||
         '<tr><td colspan="6" class="text-center text-muted">ไม่มีข้อมูล</td></tr>';
@@ -1854,7 +1857,7 @@ window.loadReportProfit = async () => {
             r.revenue > 0 ? ((r.profit / r.revenue) * 100).toFixed(1) : 0;
           const cls = r.profit >= 0 ? "text-profit" : "text-loss";
           return `<tr>
-          <td>${r.name}</td>
+          <td>${esc(r.name)}</td>
           <td class="text-end">${fmt.number(r.qty)}</td>
           <td class="text-end">${fmt.currency(r.revenue)}</td>
           <td class="text-end">${fmt.currency(r.cost)}</td>
@@ -1926,7 +1929,9 @@ async function loadNotifications() {
       </div>`,
       )
       .join("");
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 window.toggleNotif = () => {
@@ -2025,7 +2030,9 @@ window.doSearch = () => {
           .join("");
       }
       document.getElementById("search-results").innerHTML = html;
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }, 280);
 };
 
@@ -2235,15 +2242,17 @@ async function loadDashActivity() {
       <div class="activity-item">
         <div class="activity-dot ${r.type}"><i class="bi ${icons[r.type] || "bi-circle-fill"}"></i></div>
         <div class="activity-info">
-          <div class="activity-title">${r.ref}</div>
-          <div class="activity-sub">${r.detail}${r.amount ? ` · ${r.type === "sale" ? fmt.currency(r.amount) : fmt.number(r.amount)}` : ""}</div>
+          <div class="activity-title">${esc(r.ref)}</div>
+          <div class="activity-sub">${esc(r.detail)}${r.amount ? ` · ${r.type === "sale" ? fmt.currency(r.amount) : fmt.number(r.amount)}` : ""}</div>
         </div>
         <div class="activity-time">${fmt.timeAgo(r.created_at)}</div>
       </div>`,
         )
         .join("") +
       "</div>";
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 async function loadDashAlerts() {
@@ -2261,11 +2270,13 @@ async function loadDashAlerts() {
         .slice(0, 4)
         .map(
           (a) => `
-      <div class="alert-item ${a.type}"><i class="bi bi-${a.icon}"></i>${a.msg}</div>`,
+      <div class="alert-item ${a.type}"><i class="bi bi-${a.icon}"></i>${esc(a.msg)}</div>`,
         )
         .join("") +
       "</div>";
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 // Hook dashboard.load to also load activity
@@ -2300,7 +2311,9 @@ async function loadSettingsPage() {
         tax: dbSettings.company_tax || co.tax || "",
       };
     }
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
   document.getElementById("set-company").value = co.name || "";
   document.getElementById("set-address").value = co.address || "";
   document.getElementById("set-phone").value = co.phone || "";
@@ -2330,10 +2343,15 @@ window.saveCompanySettings = async () => {
   };
   try {
     await api.put("/api/settings", data);
-    localStorage.setItem("tws_company", JSON.stringify({
-      name: data.company_name, address: data.company_address,
-      phone: data.company_phone, tax: data.company_tax,
-    }));
+    localStorage.setItem(
+      "tws_company",
+      JSON.stringify({
+        name: data.company_name,
+        address: data.company_address,
+        phone: data.company_phone,
+        tax: data.company_tax,
+      }),
+    );
     toast("บันทึกข้อมูลบริษัทสำเร็จ");
   } catch (e) {
     console.error(e);
@@ -2383,12 +2401,12 @@ async function loadQC() {
       .map(
         (r) => `<tr>
       <td>${fmt.date(r.test_date)}</td>
-      <td><code>${r.batch_number || "-"}</code></td>
-      <td>${r.product_name || "-"}</td>
+      <td><code>${esc(r.batch_number) || "-"}</code></td>
+      <td>${esc(r.product_name) || "-"}</td>
       <td>${r.ph ?? "-"}</td><td>${r.tds ?? "-"}</td><td>${r.turbidity ?? "-"}</td><td>${r.chlorine ?? "-"}</td>
       <td>${r.bacteria_count ?? "-"}</td>
       <td><span class="badge ${r.result === "pass" ? "bg-success" : r.result === "fail" ? "bg-danger" : "bg-warning"}">${r.result === "pass" ? "ผ่าน" : r.result === "fail" ? "ไม่ผ่าน" : "รอผล"}</span></td>
-      <td>${r.tester || "-"}</td>
+      <td>${esc(r.tester) || "-"}</td>
       <td><button class="btn btn-outline-primary btn-sm" onclick="showQcModal(${r.id})"><i class="bi bi-pencil"></i></button>
           <button class="btn btn-outline-danger btn-sm" onclick="deleteQc(${r.id})"><i class="bi bi-trash"></i></button></td>
     </tr>`,
@@ -2413,10 +2431,12 @@ window.showQcModal = async (id) => {
         .filter((p) => p.batch_number)
         .map(
           (p) =>
-            `<option value="${p.id}" data-batch="${p.batch_number}">${p.batch_number} - ${p.product_name}</option>`,
+            `<option value="${p.id}" data-batch="${esc(p.batch_number)}">${esc(p.batch_number)} - ${esc(p.product_name)}</option>`,
         )
         .join("");
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
   if (id) {
     try {
       const data = await api.get("/api/qc");
@@ -2437,7 +2457,9 @@ window.showQcModal = async (id) => {
         document.getElementById("qc-result").value = r.result || "pending";
         document.getElementById("qc-notes").value = r.notes || "";
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }
   new bootstrap.Modal("#qcModal").show();
 };
@@ -2496,12 +2518,12 @@ async function loadSuppliers() {
       .map(
         (s) => `<div class="col-12 col-md-6 col-lg-4">
       <div class="card h-100"><div class="card-body">
-        <h6 class="card-title"><i class="bi bi-building me-1"></i>${s.name} <small class="text-muted">(${s.code})</small></h6>
-        <p class="card-text small mb-1"><i class="bi bi-person me-1"></i>${s.contact_person || "-"}</p>
-        <p class="card-text small mb-1"><i class="bi bi-telephone me-1"></i>${s.phone || "-"}</p>
-        <p class="card-text small mb-1"><i class="bi bi-envelope me-1"></i>${s.email || "-"}</p>
-        <p class="card-text small mb-0"><i class="bi bi-geo-alt me-1"></i>${s.address || "-"}</p>
-        ${s.notes ? `<p class="card-text small text-muted mt-1">${s.notes}</p>` : ""}
+        <h6 class="card-title"><i class="bi bi-building me-1"></i>${esc(s.name)} <small class="text-muted">(${esc(s.code)})</small></h6>
+        <p class="card-text small mb-1"><i class="bi bi-person me-1"></i>${esc(s.contact_person) || "-"}</p>
+        <p class="card-text small mb-1"><i class="bi bi-telephone me-1"></i>${esc(s.phone) || "-"}</p>
+        <p class="card-text small mb-1"><i class="bi bi-envelope me-1"></i>${esc(s.email) || "-"}</p>
+        <p class="card-text small mb-0"><i class="bi bi-geo-alt me-1"></i>${esc(s.address) || "-"}</p>
+        ${s.notes ? `<p class="card-text small text-muted mt-1">${esc(s.notes)}</p>` : ""}
       </div><div class="card-footer d-flex gap-1">
         <button class="btn btn-outline-primary btn-sm" onclick="showSupplierModal(${s.id})"><i class="bi bi-pencil"></i></button>
         <button class="btn btn-outline-danger btn-sm" onclick="deleteSupplier(${s.id})"><i class="bi bi-trash"></i></button>
@@ -2530,7 +2552,9 @@ window.showSupplierModal = async (id) => {
         document.getElementById("sup-address").value = s.address || "";
         document.getElementById("sup-notes").value = s.notes || "";
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }
   new bootstrap.Modal("#supplierModal").show();
 };
@@ -2601,8 +2625,8 @@ async function loadPurchaseOrders() {
     tbody.innerHTML = data
       .map(
         (p) => `<tr>
-      <td><code>${p.po_number}</code></td>
-      <td>${p.supplier_name || "-"}</td>
+      <td><code>${esc(p.po_number)}</code></td>
+      <td>${esc(p.supplier_name) || "-"}</td>
       <td>${fmt.date(p.order_date)}</td>
       <td>${fmt.date(p.expected_date)}</td>
       <td>${fmt.currency(p.total_amount)}</td>
@@ -2628,7 +2652,7 @@ window.addPOItem = () => {
   div.innerHTML = `
     <div class="col-5"><select class="form-select form-select-sm" id="poi-mat-${idx}">
       <option value="">-- วัตถุดิบ --</option>
-      ${allMaterials.map((m) => `<option value="${m.id}">${m.name} (${m.unit})</option>`).join("")}
+      ${allMaterials.map((m) => `<option value="${m.id}">${esc(m.name)} (${esc(m.unit)})</option>`).join("")}
     </select></div>
     <div class="col-3"><input type="number" class="form-control form-control-sm" placeholder="จำนวน" id="poi-qty-${idx}" min="1" oninput="calcPOTotal()"></div>
     <div class="col-3"><input type="number" class="form-control form-control-sm" placeholder="ราคา/หน่วย" id="poi-price-${idx}" step="0.01" min="0" oninput="calcPOTotal()"></div>
@@ -2658,12 +2682,16 @@ window.showPOModal = async () => {
     const sups = await api.get("/api/suppliers");
     document.getElementById("po-supplier").innerHTML =
       '<option value="">-- เลือก --</option>' +
-      sups.map((s) => `<option value="${s.id}">${s.name}</option>`).join("");
-  } catch (e) { console.error(e); }
+      sups.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join("");
+  } catch (e) {
+    console.error(e);
+  }
   // Load materials
   try {
     allMaterials = await api.get("/api/materials");
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
   addPOItem();
   new bootstrap.Modal("#poModal").show();
 };
@@ -2771,10 +2799,10 @@ async function loadExpenses() {
         (e) => `<tr>
       <td>${fmt.date(e.expense_date)}</td>
       <td><span class="badge bg-secondary">${catLabels[e.category] || e.category}</span></td>
-      <td>${e.description || "-"}</td>
-      <td>${e.vendor || "-"}</td>
+      <td>${esc(e.description) || "-"}</td>
+      <td>${esc(e.vendor) || "-"}</td>
       <td class="text-danger fw-bold">${fmt.currency(e.amount)}</td>
-      <td>${e.receipt_ref || "-"}</td>
+      <td>${esc(e.receipt_ref) || "-"}</td>
       <td><button class="btn btn-outline-primary btn-sm" onclick="showExpenseModal(${e.id})"><i class="bi bi-pencil"></i></button>
           <button class="btn btn-outline-danger btn-sm" onclick="deleteExpense(${e.id})"><i class="bi bi-trash"></i></button></td>
     </tr>`,
@@ -2802,7 +2830,9 @@ window.showExpenseModal = async (id) => {
         document.getElementById("exp-desc").value = e.description || "";
         document.getElementById("exp-ref").value = e.receipt_ref || "";
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }
   new bootstrap.Modal("#expenseModal").show();
 };
@@ -2868,10 +2898,10 @@ async function loadMaintenance() {
           e.next_maintenance <= dueIn7.toISOString().slice(0, 10);
         return `<div class="col-12 col-md-6 col-lg-4">
         <div class="card h-100 ${isDue ? "border-warning" : ""}"><div class="card-body">
-          <h6 class="card-title"><i class="bi bi-gear me-1"></i>${e.name} <small class="text-muted">(${e.code})</small></h6>
+          <h6 class="card-title"><i class="bi bi-gear me-1"></i>${esc(e.name)} <small class="text-muted">(${esc(e.code)})</small></h6>
           <span class="badge ${e.status === "active" ? "bg-success" : e.status === "maintenance" ? "bg-warning" : "bg-secondary"} mb-2">${e.status === "active" ? "ใช้งาน" : e.status === "maintenance" ? "ซ่อมบำรุง" : "ไม่ใช้งาน"}</span>
-          <p class="card-text small mb-1"><i class="bi bi-tag me-1"></i>ประเภท: ${e.type || "-"} | รุ่น: ${e.model || "-"}</p>
-          <p class="card-text small mb-1"><i class="bi bi-geo-alt me-1"></i>${e.location || "-"}</p>
+          <p class="card-text small mb-1"><i class="bi bi-tag me-1"></i>ประเภท: ${esc(e.type) || "-"} | รุ่น: ${esc(e.model) || "-"}</p>
+          <p class="card-text small mb-1"><i class="bi bi-geo-alt me-1"></i>${esc(e.location) || "-"}</p>
           <p class="card-text small mb-1"><i class="bi bi-wrench me-1"></i>ซ่อมล่าสุด: ${e.last_maintenance ? fmt.date(e.last_maintenance) : "-"}</p>
           <p class="card-text small mb-0 ${isDue ? "text-danger fw-bold" : ""}"><i class="bi bi-calendar-check me-1"></i>ซ่อมครั้งถัดไป: ${e.next_maintenance ? fmt.date(e.next_maintenance) : "-"} ${isDue ? "⚠️" : ""}</p>
         </div><div class="card-footer d-flex gap-1">
@@ -2904,7 +2934,9 @@ window.showEquipmentModal = async (id) => {
         document.getElementById("eq-status").value = e.status || "active";
         document.getElementById("eq-notes").value = e.notes || "";
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }
   new bootstrap.Modal("#equipmentModal").show();
 };
@@ -2954,9 +2986,11 @@ window.showMaintenanceModal = async () => {
     document.getElementById("mt-equipment").innerHTML =
       '<option value="">-- เลือก --</option>' +
       eqData
-        .map((e) => `<option value="${e.id}">${e.name} (${e.code})</option>`)
+        .map((e) => `<option value="${e.id}">${esc(e.name)} (${esc(e.code)})</option>`)
         .join("");
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
   new bootstrap.Modal("#maintenanceModal").show();
 };
 
@@ -2993,8 +3027,10 @@ async function loadDeposits() {
       api.get("/api/deposits/summary"),
     ]);
     document.getElementById("dep-out").textContent = summaryRes.totalOut || 0;
-    document.getElementById("dep-returned").textContent = summaryRes.totalReturned || 0;
-    document.getElementById("dep-outstanding").textContent = summaryRes.outstanding || 0;
+    document.getElementById("dep-returned").textContent =
+      summaryRes.totalReturned || 0;
+    document.getElementById("dep-outstanding").textContent =
+      summaryRes.outstanding || 0;
     // Summary table
     const byCustomer = summaryRes.byCustomer || [];
     document.getElementById("dep-summary-table").innerHTML = byCustomer
@@ -3029,8 +3065,10 @@ window.showDepositModal = async () => {
     const custs = await api.get("/api/customers");
     document.getElementById("dep-customer").innerHTML =
       '<option value="">-- เลือกลูกค้า --</option>' +
-      custs.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
-  } catch (e) { console.error(e); }
+      custs.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join("");
+  } catch (e) {
+    console.error(e);
+  }
   new bootstrap.Modal("#depositModal").show();
 };
 
@@ -3085,8 +3123,8 @@ async function loadReturns() {
         (r) => `<tr>
       <td>${fmt.date(r.return_date)}</td>
       <td>${r.order_id ? "#" + r.order_id : "-"}</td>
-      <td>${r.product_name || "-"}</td>
-      <td><code>${r.batch_number || "-"}</code></td>
+      <td>${esc(r.product_name) || "-"}</td>
+      <td><code>${esc(r.batch_number) || "-"}</code></td>
       <td>${r.quantity}</td>
       <td>${reasonLabels[r.reason] || r.reason}</td>
       <td><span class="badge bg-${statusColors[r.status] || "secondary"}">${statusLabels[r.status] || r.status}</span></td>
@@ -3106,17 +3144,19 @@ window.showReturnModal = async () => {
     const prods = await api.get("/api/products");
     document.getElementById("ret-product").innerHTML =
       '<option value="">-- เลือก --</option>' +
-      prods.map((p) => `<option value="${p.id}">${p.name}</option>`).join("");
+      prods.map((p) => `<option value="${p.id}">${esc(p.name)}</option>`).join("");
     const sales = await api.get("/api/sales");
     document.getElementById("ret-order").innerHTML =
       '<option value="">-- ไม่ระบุ --</option>' +
       sales
         .map(
           (s) =>
-            `<option value="${s.id}">#${s.id} - ${s.customer_name || "-"}</option>`,
+            `<option value="${s.id}">#${s.id} - ${esc(s.customer_name) || "-"}</option>`,
         )
         .join("");
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
   new bootstrap.Modal("#returnModal").show();
 };
 
@@ -3170,7 +3210,7 @@ window.rejectReturn = async (id) => {
 
 // ─── AUDIT LOGS ──────────────────────────────────────────────────────
 async function loadAuditLogs() {
-  if (!["admin","manager"].includes(currentUser?.role)) {
+  if (!["admin", "manager"].includes(currentUser?.role)) {
     document.getElementById("audit-table").innerHTML =
       '<tr><td colspan="6" class="text-center text-danger">เฉพาะผู้ดูแลระบบเท่านั้น</td></tr>';
     return;
@@ -3181,11 +3221,11 @@ async function loadAuditLogs() {
       .map(
         (l) => `<tr>
       <td>${new Date(l.created_at).toLocaleString("th-TH", { dateStyle: "short", timeStyle: "short" })}</td>
-      <td>${l.user_name || "-"}</td>
-      <td><span class="badge bg-secondary">${l.action}</span></td>
-      <td>${l.entity || "-"}</td>
+      <td>${esc(l.user_name) || "-"}</td>
+      <td><span class="badge bg-secondary">${esc(l.action)}</span></td>
+      <td>${esc(l.entity) || "-"}</td>
       <td>${l.entity_id || "-"}</td>
-      <td class="small">${l.details || "-"}</td>
+      <td class="small">${esc(l.details) || "-"}</td>
     </tr>`,
       )
       .join("");
@@ -3200,14 +3240,28 @@ async function loadDeliveryRoutes() {
     const data = await api.get("/api/delivery-routes");
     const tbody = document.getElementById("delivery-routes-tbody");
     if (!data.length) {
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">ยังไม่มีเส้นทางจัดส่ง</td></tr>';
+      tbody.innerHTML =
+        '<tr><td colspan="7" class="text-center text-muted py-4">ยังไม่มีเส้นทางจัดส่ง</td></tr>';
       return;
     }
-    tbody.innerHTML = data.map(r => {
-      const st = r.status || "pending";
-      const stCls = { pending: "warning", in_progress: "primary", completed: "success", cancelled: "secondary" }[st] || "secondary";
-      const stLabel = { pending: "รอจัดส่ง", in_progress: "กำลังจัดส่ง", completed: "จัดส่งแล้ว", cancelled: "ยกเลิก" }[st] || st;
-      return `<tr>
+    tbody.innerHTML = data
+      .map((r) => {
+        const st = r.status || "pending";
+        const stCls =
+          {
+            pending: "warning",
+            in_progress: "primary",
+            completed: "success",
+            cancelled: "secondary",
+          }[st] || "secondary";
+        const stLabel =
+          {
+            pending: "รอจัดส่ง",
+            in_progress: "กำลังจัดส่ง",
+            completed: "จัดส่งแล้ว",
+            cancelled: "ยกเลิก",
+          }[st] || st;
+        return `<tr>
         <td>${esc(r.route_name)}</td>
         <td>${esc(r.driver_name || "-")}</td>
         <td>${esc(r.vehicle_number || "-")}</td>
@@ -3219,7 +3273,8 @@ async function loadDeliveryRoutes() {
           ${st === "in_progress" ? `<button class="btn btn-sm btn-outline-success" onclick="updateRouteStatus(${r.id},'completed')"><i class="bi bi-check-lg"></i></button>` : ""}
         </td>
       </tr>`;
-    }).join("");
+      })
+      .join("");
   } catch (e) {
     console.error(e);
     toast("โหลดเส้นทางจัดส่งผิดพลาด", "danger");
@@ -3227,21 +3282,30 @@ async function loadDeliveryRoutes() {
 }
 
 window.showDeliveryRouteModal = async (id) => {
-  const modal = new bootstrap.Modal(document.getElementById("deliveryRouteModal"));
+  const modal = new bootstrap.Modal(
+    document.getElementById("deliveryRouteModal"),
+  );
   document.getElementById("dr-name").value = "";
   document.getElementById("dr-driver").value = "";
   document.getElementById("dr-vehicle").value = "";
-  document.getElementById("dr-date").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("dr-date").value = new Date()
+    .toISOString()
+    .slice(0, 10);
   document.getElementById("dr-notes").value = "";
   // Load pending sales orders for selection
   try {
     const orders = await api.get("/api/sales");
     const sel = document.getElementById("dr-orders");
     sel.innerHTML = orders
-      .filter(o => o.status === "confirmed" || o.status === "pending")
-      .map(o => `<option value="${o.id}">${esc(o.order_number)} - ${esc(o.customer_name)} (${fmt.currency(o.total_amount)})</option>`)
+      .filter((o) => o.status === "confirmed" || o.status === "pending")
+      .map(
+        (o) =>
+          `<option value="${o.id}">${esc(o.order_number)} - ${esc(o.customer_name)} (${fmt.currency(o.total_amount)})</option>`,
+      )
       .join("");
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
   modal.show();
 };
 
@@ -3252,12 +3316,17 @@ window.saveDeliveryRoute = async () => {
     vehicle_number: document.getElementById("dr-vehicle").value.trim(),
     delivery_date: document.getElementById("dr-date").value,
     notes: document.getElementById("dr-notes").value.trim(),
-    order_ids: Array.from(document.getElementById("dr-orders").selectedOptions).map(o => Number(o.value)),
+    order_ids: Array.from(
+      document.getElementById("dr-orders").selectedOptions,
+    ).map((o) => Number(o.value)),
   };
-  if (!data.route_name || !data.delivery_date) return toast("กรุณากรอกข้อมูลให้ครบ", "warning");
+  if (!data.route_name || !data.delivery_date)
+    return toast("กรุณากรอกข้อมูลให้ครบ", "warning");
   try {
     await api.post("/api/delivery-routes", data);
-    bootstrap.Modal.getInstance(document.getElementById("deliveryRouteModal")).hide();
+    bootstrap.Modal.getInstance(
+      document.getElementById("deliveryRouteModal"),
+    ).hide();
     toast("สร้างเส้นทางจัดส่งสำเร็จ");
     loadDeliveryRoutes();
   } catch (e) {
@@ -3343,7 +3412,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const users = {
   data: [],
   async load() {
-    if (!["admin","manager"].includes(currentUser?.role)) {
+    if (!["admin", "manager"].includes(currentUser?.role)) {
       document.getElementById("users-tbody").innerHTML =
         '<tr><td colspan="7" class="text-center text-danger">ไม่มีสิทธิ์เข้าถึง</td></tr>';
       return;
@@ -3363,8 +3432,8 @@ const users = {
         (u) => `
       <tr>
         <td>${u.id}</td>
-        <td><code>${u.username}</code></td>
-        <td>${u.name}</td>
+        <td><code>${esc(u.username)}</code></td>
+        <td>${esc(u.name)}</td>
         <td><span class="badge ${roleBadgeClass(u.role)}">${roleLabel(u.role)}</span></td>
         <td>${u.active ? '<span class="badge bg-success">ใช้งาน</span>' : '<span class="badge bg-secondary">ระงับ</span>'}</td>
         <td>${fmt.date(u.created_at)}</td>

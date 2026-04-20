@@ -3531,9 +3531,11 @@
             <button class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
-            <form id="deliveryRouteForm" onsubmit="return false">
+            <form id="deliveryRouteForm" onsubmit="return false;">
               <div class="mb-3">
-                <label class="form-label">ชื่อเส้นทาง <span class="text-danger">*</span></label>
+                <label class="form-label"
+                  >ชื่อเส้นทาง <span class="text-danger">*</span></label
+                >
                 <input type="text" class="form-control" id="dr-name" required />
               </div>
               <div class="row g-3 mb-3">
@@ -3547,22 +3549,35 @@
                 </div>
               </div>
               <div class="mb-3">
-                <label class="form-label">วันจัดส่ง <span class="text-danger">*</span></label>
+                <label class="form-label"
+                  >วันจัดส่ง <span class="text-danger">*</span></label
+                >
                 <input type="date" class="form-control" id="dr-date" required />
               </div>
               <div class="mb-3">
                 <label class="form-label">ออเดอร์ที่จัดส่ง</label>
-                <select class="form-select" id="dr-orders" multiple size="5"></select>
+                <select
+                  class="form-select"
+                  id="dr-orders"
+                  multiple
+                  size="5"
+                ></select>
                 <small class="text-muted">กด Ctrl+Click เลือกหลายรายการ</small>
               </div>
               <div class="mb-3">
                 <label class="form-label">หมายเหตุ</label>
-                <textarea class="form-control" id="dr-notes" rows="2"></textarea>
+                <textarea
+                  class="form-control"
+                  id="dr-notes"
+                  rows="2"
+                ></textarea>
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              ยกเลิก
+            </button>
             <button class="btn btn-dark" onclick="saveDeliveryRoute()">
               <i class="bi bi-save me-1"></i>บันทึก
             </button>
